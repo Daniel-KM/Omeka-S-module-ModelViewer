@@ -41,6 +41,8 @@ class ThreeJs implements RendererInterface
         if (!$hasThreeJs) {
             $hasThreeJs = true;
             $assetUrl = $view->plugin('assetUrl');
+            $view->headLink()
+                ->appendStylesheet($assetUrl('css/threejs.css', 'ThreeJs'));
             // Js modules are not used because not enough supported currently.
             $view->headScript()
                 ->appendFile($assetUrl('vendor/threejs/three.min.js', 'ThreeJs'), 'text/javascript', ['defer' => 'defer'])
@@ -51,6 +53,8 @@ class ThreeJs implements RendererInterface
                 // Format ThreeJs.
                 ->appendFile($assetUrl('vendor/threejs/js/libs/chevrotain.min.js', 'ThreeJs'), 'text/javascript', ['defer' => 'defer'])
                 ->appendFile($assetUrl('vendor/threejs/js/loaders/VRMLoader.js', 'ThreeJs'), 'text/javascript', ['defer' => 'defer'])
+                // Manager.
+                ->appendFile($assetUrl('js/threejs.js', 'ThreeJs'), 'text/javascript', ['defer' => 'defer'])
             ;
         }
 

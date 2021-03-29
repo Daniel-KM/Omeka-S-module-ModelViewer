@@ -3,9 +3,11 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
  * @var array $options
- *
- * Can be used directly or through media file rendering.
  */
+
+// Can be used directly or through media file rendering.
+$resource = $resource ?? null;
+$options = $options ?? [];
 
 $supported = ['model/gltf-binary', 'model/gltf+json', 'application/vnd.threejs+json', 'application/octet-stream'];
 
@@ -37,204 +39,33 @@ if ($resource instanceof \Omeka\Api\Representation\ItemRepresentation) {
     $media = $resource;
 } elseif (empty($options['source'])) {
     return;
-} elseif (empty($options['media_type'])) {
+} elseif (empty($options['mediaType'])) {
     $mediaType = 'model/gltf+json';
-} elseif (in_array($options['media_type'], $supported)) {
-    $mediaType = $options['media_type'];
+} elseif (in_array($options['mediaType'], $supported)) {
+    $mediaType = $options['mediaType'];
 } else {
     return;
 }
 
-$id = $media->id();
-$source = empty($options['source']) ? $media->originalUrl() : $options['source'];
-$dirpath = dirname($source) . '/';
-$filename = basename($source);
-?>
-<style>
-.threejs canvas {
-    width: 100%;
-    height: 100%;
+$options['id'] = $options['id'] ?? ($media ? 'threejs-' . $media->id() : 'threejs-0');
+$options['source'] = empty($options['source']) ? $media->originalUrl() : $options['source'];
+$options['dirpath'] = dirname($options['source']) . '/';
+$options['filename'] = basename($options['source']);
+$options['mediaType'] = $mediaType;
+
+$optionsJson = json_encode($options, 448);
+$script = <<<JS
+if (typeof threejsOptions === 'undefined') {
+    var threejsOptions = [];
 }
-</style>
+threejsOptions.push($optionsJson);
+JS;
+$this->headScript()
+    ->appendScript($script);
+?>
 
 <?php if (!empty($options['heading'])): ?>
     <h2><?= $options['heading'] ?></h2>
 <?php endif; ?>
 
-<div id="threejs-<?= $id ?>" class="threejs" allowfullscreen="allowfullscreen" style="height: 600px; height: 70vh;"><canvas></canvas></div>
-
-<script type="text/javascript">
-window.addEventListener('DOMContentLoaded', function() {
-
-    // Simplified from https://threejs.org/docs/#examples/en/loaders/GLTFLoader and https://threejsfundamentals.org/threejs/threejs-load-gltf.html.
-
-    // TODO Use page background color (or "white" or "lightgray" or #181818 or anything else).
-    const background = 'white';
-
-    const container = document.getElementById( 'threejs-<?= $id ?>' );
-    const canvas = document.querySelector( '#threejs-<?= $id ?> canvas' );
-
-    function main() {
-        const renderer = new THREE.WebGLRenderer({
-            canvas: canvas,
-            // TODO Disable antialias on low mobile devices.
-            antialias: true,
-        });
-
-        const scene = new THREE.Scene();
-
-        const fov = 45;
-        const aspect = container.clientWidth / container.clientHeight;
-        const near = 0.01;
-        const far = 10000;
-        const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
-        camera.position.set( 0, 10, 20 );
-
-        const controls = new THREE.OrbitControls( camera, canvas );
-        controls.target.set( 0, 5, 0 );
-        controls.update();
-
-        {
-            const pmremGenerator = new THREE.PMREMGenerator( renderer );
-            scene.background = new THREE.Color( 'white' );
-            scene.environment = pmremGenerator.fromScene( scene ).texture;
-            scene.background = new THREE.Color( background );
-            renderer.outputEncoding = THREE.sRGBEncoding;
-            renderer.physicallyCorrectLights = true;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.gammaFactor = 2.2;
-        }
-
-        {
-            const color = 0xFFFFFF;
-            const intensity = 0.3;
-            const light = new THREE.AmbientLight( color, intensity );
-            scene.add( light );
-        }
-
-        {
-            const color = 0xFFFFFF;
-            const intensity = 1;
-            light = new THREE.DirectionalLight( color, intensity );
-            light.position.set( 1, 1, 1 );
-            scene.add( light );
-        }
-
-        function frameArea( sizeToFitOnScreen, boxSize, boxCenter, camera ) {
-            const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
-            const halfFovY = THREE.MathUtils.degToRad( camera.fov * .5 );
-            const distance = halfSizeToFitOnScreen / Math.tan( halfFovY );
-            const direction = ( new THREE.Vector3() )
-                .subVectors( camera.position, boxCenter )
-                .multiply( new THREE.Vector3(1, 0, 1) )
-                .normalize();
-            camera.position.copy( direction.multiplyScalar( distance ).add(boxCenter) );
-            camera.near = boxSize / 1000;
-            camera.far = boxSize * 1000;
-            camera.updateProjectionMatrix();
-            camera.lookAt( boxCenter.x, boxCenter.y, boxCenter.z );
-        }
-
-        <?php switch ($mediaType):
-        default:
-        case 'model/gltf-binary':
-        case 'model/gltf+json': ?>
-        {
-            const gltfLoader = new THREE.GLTFLoader();
-            gltfLoader
-                .setPath( <?= json_encode($dirpath, 320) ?> )
-                .load(
-                    <?= json_encode($filename, 320) ?>,
-                    function ( gltf ) {
-                        scene.add( gltf.scene );
-
-                        gltf.animations;
-                        gltf.scene;
-                        gltf.scenes;
-                        gltf.cameras;
-                        gltf.asset;
-
-                        const box = new THREE.Box3().setFromObject( gltf.scene );
-                        const boxSize = box.getSize( new THREE.Vector3() ).length();
-                        const boxCenter = box.getCenter( new THREE.Vector3() );
-                        frameArea(boxSize, boxSize, boxCenter, camera);
-
-                        controls.maxDistance = boxSize * 100;
-                        controls.target.copy( boxCenter );
-                        controls.update();
-                    },
-                    function ( xhr ) {
-                        var url = xhr.srcElement.responseURL;
-                        var size = Math.floor( xhr.total / 1000 );
-                        var progress = Math.floor( ( xhr.loaded / xhr.total ) * 100 );
-                        console.log( `Loading ${url.substring(url.lastIndexOf('/') + 1)} (${size} KB) ${progress}%` );
-                    },
-                    function ( error ) {
-                        console.log( 'An error happened' );
-                    }
-                )
-        }
-        <?php break;
-
-        case 'application/vnd.threejs+json': ?>
-        {
-            const loader = new THREE.VRMLoader();
-            loader
-                .load(
-                    <?= json_encode($source, 320) ?>,
-                    function (obj) {
-                        scene.add( obj );
-
-                        const box = new THREE.Box3().setFromObject( obj );
-                        const boxSize = box.getSize( new THREE.Vector3() ).length();
-                        const boxCenter = box.getCenter( new THREE.Vector3() );
-                        frameArea(box Size, boxSize, boxCenter, camera );
-
-                        controls.maxDistance = boxSize * 100;
-                        controls.target.copy( boxCenter );
-                        controls.update();
-                    },
-                    function ( xhr ) {
-                        var url = xhr.srcElement.responseURL;
-                        var size = Math.floor( xhr.total / 1000 );
-                        var progress = Math.floor( ( xhr.loaded / xhr.total ) * 100 );
-                        console.log( `Loading ${url.substring(url.lastIndexOf('/') + 1)} (${size} KB) ${progress}%` );
-                    },
-                    function ( error ) {
-                        console.log( 'An error happened' );
-                    }
-                );
-        }
-        <?php break;
-        endswitch; ?>
-
-        function resizeRendererToDisplaySize( renderer ) {
-            const canvas = renderer.domElement;
-            const width = canvas.clientWidth;
-            const height = canvas.clientHeight;
-            const needResize = canvas.width !== width || canvas.height !== height;
-            if ( needResize ) {
-                renderer.setSize( width, height, false );
-            }
-            return needResize;
-        }
-
-        function render() {
-            if (resizeRendererToDisplaySize( renderer )) {
-                const canvas = renderer.domElement;
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-            }
-
-            renderer.render( scene, camera );
-
-            requestAnimationFrame( render );
-        }
-
-        requestAnimationFrame( render );
-    }
-
-    main();
-
-});
-</script>
+<div id="<?= $options['id'] ?>" <?= $options['attributes'] ?? 'class="threejs" allowfullscreen="allowfullscreen" style="height: 600px; height: 70vh;"' ?>><canvas></canvas></div>
