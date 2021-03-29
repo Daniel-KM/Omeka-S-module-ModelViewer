@@ -1,0 +1,42 @@
+{
+    "name": "daniel-km/omeka-s-module-threejs",
+    "description": "Integrates the Three js viewer in order to display 3D models.",
+    "type": "library",
+    "license": "CECILL-2.1",
+    "authors": [
+        {
+            "name": "Daniel Berthereau",
+            "email": "Daniel.git@Berthereau.net"
+        }
+    ],
+    "require": {
+        "mrdoob/threejs": "126"
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "mrdoob/threejs",
+                "version": "126",
+                "dist": {
+                    "type": "file",
+                    "url": "https://github.com/mrdoob/three.js/raw/r126/build/three.min.js",
+                    "reference": "r126"
+                },
+                "source": {
+                    "url": "https://github.com/mrdoob/three.js",
+                    "type": "svn",
+                    "reference":"r126"
+                }
+            }
+        }
+    ],
+    "scripts": {
+        "post-install-cmd": "@build",
+        "post-update-cmd": "@build",
+        "build": [
+            "mkdir -p asset/vendor/threejs",
+            "cp 'vendor/mrdoob/threejs/three.min.js' 'asset/vendor/threejs/three.min.js'"
+        ]
+    }
+}
