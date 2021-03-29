@@ -48,6 +48,9 @@ class ThreeJs implements RendererInterface
                 ->appendFile($assetUrl('vendor/threejs/js/controls/FirstPersonControls.js', 'ThreeJs'), 'text/javascript', ['defer' => 'defer'])
                 // Format glTF v2.0.
                 ->appendFile($assetUrl('vendor/threejs/js/loaders/GLTFLoader.js', 'ThreeJs'), 'text/javascript', ['defer' => 'defer'])
+                // Format ThreeJs.
+                ->appendFile($assetUrl('vendor/threejs/js/libs/chevrotain.min.js', 'ThreeJs'), 'text/javascript', ['defer' => 'defer'])
+                ->appendFile($assetUrl('vendor/threejs/js/loaders/VRMLoader.js', 'ThreeJs'), 'text/javascript', ['defer' => 'defer'])
             ;
         }
 

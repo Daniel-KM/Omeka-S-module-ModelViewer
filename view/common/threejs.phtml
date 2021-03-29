@@ -3,9 +3,11 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
  * @var array $options
+ *
+ * Can be used directly or through media file rendering.
  */
 
-$supported = ['model/gltf-binary', 'model/gltf+json'];
+$supported = ['model/gltf-binary', 'model/gltf+json', 'application/vnd.threejs+json', 'application/octet-stream'];
 
 $media = null;
 if ($resource instanceof \Omeka\Api\Representation\ItemRepresentation) {
@@ -13,6 +15,9 @@ if ($resource instanceof \Omeka\Api\Representation\ItemRepresentation) {
     foreach ($resource->media() as $itemMedia) {
         $mediaType = $itemMedia->mediaType();
         if (in_array($mediaType, $supported)) {
+            if ($mediaType === 'application/octet-stream' && !$itemMedia->e()) {
+                continue;
+            }
             $media = $itemMedia;
             break;
         }
@@ -26,8 +31,17 @@ if ($resource instanceof \Omeka\Api\Representation\ItemRepresentation) {
     if (!in_array($mediaType, $supported)) {
         return;
     }
+    if ($mediaType === 'application/octet-stream' && $media->extension() !== 'glb') {
+        return;
+    }
     $media = $resource;
 } elseif (empty($options['source'])) {
+    return;
+} elseif (empty($options['media_type'])) {
+    $mediaType = 'model/gltf+json';
+} elseif (in_array($options['media_type'], $supported)) {
+    $mediaType = $options['media_type'];
+} else {
     return;
 }
 
@@ -121,6 +135,10 @@ window.addEventListener('DOMContentLoaded', function() {
             camera.lookAt( boxCenter.x, boxCenter.y, boxCenter.z );
         }
 
+        <?php switch ($mediaType):
+        default:
+        case 'model/gltf-binary':
+        case 'model/gltf+json': ?>
         {
             const gltfLoader = new THREE.GLTFLoader();
             gltfLoader
@@ -156,6 +174,39 @@ window.addEventListener('DOMContentLoaded', function() {
                     }
                 )
         }
+        <?php break;
+
+        case 'application/vnd.threejs+json': ?>
+        {
+            const loader = new THREE.VRMLoader();
+            loader
+                .load(
+                    <?= json_encode($source, 320) ?>,
+                    function (obj) {
+                        scene.add( obj );
+
+                        const box = new THREE.Box3().setFromObject( obj );
+                        const boxSize = box.getSize( new THREE.Vector3() ).length();
+                        const boxCenter = box.getCenter( new THREE.Vector3() );
+                        frameArea(box Size, boxSize, boxCenter, camera );
+
+                        controls.maxDistance = boxSize * 100;
+                        controls.target.copy( boxCenter );
+                        controls.update();
+                    },
+                    function ( xhr ) {
+                        var url = xhr.srcElement.responseURL;
+                        var size = Math.floor( xhr.total / 1000 );
+                        var progress = Math.floor( ( xhr.loaded / xhr.total ) * 100 );
+                        console.log( `Loading ${url.substring(url.lastIndexOf('/') + 1)} (${size} KB) ${progress}%` );
+                    },
+                    function ( error ) {
+                        console.log( 'An error happened' );
+                    }
+                );
+        }
+        <?php break;
+        endswitch; ?>
 
         function resizeRendererToDisplaySize( renderer ) {
             const canvas = renderer.domElement;
