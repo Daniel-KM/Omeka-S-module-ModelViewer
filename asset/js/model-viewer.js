@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
             const scene = new THREE.Scene();
 
+            const clock = new THREE.Clock();
             const fov = 45;
             const aspect = container.clientWidth / container.clientHeight;
             const near = 0.01;
@@ -112,11 +113,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 || options.mediaType === 'model/gltf-binary'
                 || options.mediaType === 'model/gltf+json'
             ) {
-                const gltfLoader = new THREE.GLTFLoader();
-                gltfLoader
-                    .setPath( options.dirpath )
+                const loader = new THREE.GLTFLoader();
+                loader
                     .load(
-                        options.filename,
+                        options.source,
                         function ( gltf ) {
                             scene.add( gltf.scene );
 
@@ -140,6 +140,88 @@ document.addEventListener('DOMContentLoaded', function(event) {
                         onLoaderProgress,
                         onLoaderError
                     );
+            } else if (options.mediaType === 'model/obj') {
+                const manager = new THREE.LoadingManager();
+                manager.addHandler( /\.dds$/i, new DDSLoader() );
+                if ( options.mtl && options.mtl.length ) {
+                    new THREE.MTLLoader( manager )
+                        .load( options.mtl[0], function ( materials ) {
+                            materials.preload();
+                            new THREE.OBJLoader( manager )
+                                .setMaterials( materials )
+                                .load(
+                                    options.source,
+                                    function ( object ) {
+                                        scene.add( object );
+                                    },
+                                    onLoaderProgress,
+                                    onLoaderError
+                                );
+                        } );
+                } else {
+                    new THREE.OBJLoader( manager )
+                        .load(
+                            options.source,
+                            function ( object ) {
+                                scene.add( object );
+                            },
+                            onLoaderProgress,
+                            onLoaderError
+                        );
+                }
+            } else if (options.mediaType === 'model/vnd.collada+xml') {
+                let colladaScene;
+                const loadingManager = new THREE.LoadingManager( function () {
+                    scene.add( colladaScene );
+                } );
+                if ( options.mtl && options.mtl.length ) {
+                    new THREE.MTLLoader( loadingManager )
+                        .load(
+                            options.mtl[0],
+                            function ( materials ) {
+                                materials.preload();
+                                new THREE.ColladaLoader( loadingManager )
+                                    .load(
+                                        options.source,
+                                        function ( collada ) {
+                                            colladaScene = collada.scene;
+                                        },
+                                        onLoaderProgress,
+                                        onLoaderError
+                                    );
+                            }
+                        );
+                } else {
+                    const loader = new THREE.ColladaLoader( loadingManager );
+                    loader
+                        .load(
+                            options.source,
+                            function ( collada ) {
+                                colladaScene = collada.scene;
+                            },
+                            onLoaderProgress,
+                            onLoaderError
+                        );
+                }
+            } else if (options.mediaType === 'model/vnd.filmbox') {
+                const loader = new THREE.FBXLoader();
+                loader.load(
+                    options.source,
+                    function ( object ) {
+                        mixer = new THREE.AnimationMixer( object );
+                        const action = mixer.clipAction( object.animations[ 0 ] );
+                        action.play();
+                        object.traverse( function ( child ) {
+                            if ( child.isMesh ) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        } );
+                        scene.add( object );
+                    },
+                    onLoaderProgress,
+                    onLoaderError
+                );
             } else if (options.mediaType === 'application/vnd.threejs+json') {
                 const loader = new THREE.VRMLoader();
                 loader
@@ -160,6 +242,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
                         onLoaderProgress,
                         onLoaderError
                     );
+            } else {
+                console.log('Media type "' + options.mediaType + '" is unsupported currently.');
+                return;
             }
 
             function resizeRendererToDisplaySize( renderer ) {
@@ -178,6 +263,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     camera.aspect = container.clientWidth / container.clientHeight;
                     camera.updateProjectionMatrix();
                 }
+
+                controls.update( clock.getDelta() );
 
                 renderer.render( scene, camera );
 

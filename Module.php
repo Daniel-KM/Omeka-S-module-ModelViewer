@@ -90,21 +90,32 @@ class Module extends AbstractModule
 
         $whitelist = $settings->get('media_type_whitelist', []);
         $whitelist = array_values(array_unique(array_merge(array_values($whitelist), [
-            'image/ktx2',
+            'application/octet-stream',
+            'application/vnd.threejs+json',
             'model/gltf-binary',
             'model/gltf+json',
-            'application/vnd.threejs+json',
-            'application/octet-stream',
+            'model/obj',
+            'model/vnd.collada+xml',
+            'model/vnd.filmbox',
+            // TODO Add all media types supported by three js.
+            // Associated files for models.
+            'image/ktx2',
+            'model/mtl',
         ])));
         $settings->set('media_type_whitelist', $whitelist);
 
         $whitelist = $settings->get('extension_whitelist', []);
         $whitelist = array_values(array_unique(array_merge(array_values($whitelist), [
             'bin',
+            'dae',
+            'fbx',
             'glb',
             'gltf',
             'json',
             'ktx2',
+            // Extensions for associated files.
+            'mtl',
+            'obj',
         ])));
         $settings->set('extension_whitelist', $whitelist);
     }

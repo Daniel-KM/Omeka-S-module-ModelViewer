@@ -6,70 +6,12 @@
  */
 
 // Can be used directly with an item or through media file rendering, so some checks are added.
+
 $resource = $resource ?? null;
-$options = $options ?? [];
-if (empty($options['config'])) {
-    $options['config'] = [
-        // Use page background color (or "white" or "lightgray" or #181818 or anything else).
-        'background' => 'white',
-        'controls' => 'OrbitControls',
-        'camera' => [
-            'position' => ['x' => 0, 'y' => 10, 'z' => 20],
-            'lookAt' => ['x' => 0, 'y' => 0, 'z' => 0],
-        ],
-    ];
-}
-
-$supported = [
-    'model/gltf-binary',
-    'model/gltf+json',
-    'application/vnd.threejs+json',
-    'application/octet-stream',
-];
-
-$media = null;
-if ($resource instanceof \Omeka\Api\Representation\ItemRepresentation) {
-    // Get the main media.
-    foreach ($resource->media() as $itemMedia) {
-        $mediaType = $itemMedia->mediaType();
-        if (in_array($mediaType, $supported)) {
-            if ($mediaType === 'application/octet-stream' && !$itemMedia->e()) {
-                continue;
-            }
-            $media = $itemMedia;
-            break;
-        }
-    }
-    if (!$media) {
-        return;
-    }
-} elseif ($resource instanceof \Omeka\Api\Representation\MediaRepresentation) {
-    // By construction, only models are here, but a check is done for direct calls.
-    $mediaType = $resource->mediaType();
-    if (!in_array($mediaType, $supported)) {
-        return;
-    }
-    if ($mediaType === 'application/octet-stream') {
-        if ($media->extension() !== 'glb') {
-            return;
-        }
-    }
-    $media = $resource;
-} elseif (empty($options['source'])) {
-    return;
-} elseif (empty($options['mediaType'])) {
-    $mediaType = 'model/gltf+json';
-} elseif (in_array($options['mediaType'], $supported)) {
-    $mediaType = $options['mediaType'];
-} else {
+$options = $this->prepareModelViewer($resource, $options ?? []);
+if (is_null($options)) {
     return;
 }
-
-$options['id'] = $options['id'] ?? ($media ? 'model-' . $media->id() : 'model-0');
-$options['source'] = empty($options['source']) ? $media->originalUrl() : $options['source'];
-$options['dirpath'] = dirname($options['source']) . '/';
-$options['filename'] = basename($options['source']);
-$options['mediaType'] = $mediaType;
 
 $optionsJson = json_encode($options, 448);
 $script = <<<JS
