@@ -9,34 +9,46 @@
             "email": "Daniel.git@Berthereau.net"
         }
     ],
-    "require": {
-        "mrdoob/threejs": "126"
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer",
+    "support": {
+        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/issues",
+        "forum": "https://forum.omeka.org/"
     },
+    "keywords": [
+        "Omeka S",
+        "Omeka S module",
+        "viewer",
+        "3D viewer",
+        "model viewer",
+        "gltf",
+        "dae",
+        "fbx"
+    ],
     "repositories": [
         {
             "type": "package",
             "package": {
                 "name": "mrdoob/threejs",
-                "version": "126",
+                "version": "127",
+                "type": "omeka-addon-asset",
                 "dist": {
-                    "type": "file",
-                    "url": "https://github.com/mrdoob/three.js/raw/r126/build/three.min.js",
-                    "reference": "r126"
-                },
-                "source": {
-                    "url": "https://github.com/mrdoob/three.js",
-                    "type": "svn",
-                    "reference":"r126"
+                    "type": "tar",
+                    "url": "https://github.com/Daniel-KM/Omeka-S-module-ModelViewer/releases/download/3.3.0.3-127/threejs.tar.gz",
+                    "reference": "3.3.0.2-127"
                 }
             }
         }
     ],
-    "scripts": {
-        "post-install-cmd": "@build",
-        "post-update-cmd": "@build",
-        "build": [
-            "mkdir -p asset/vendor/threejs",
-            "cp 'vendor/mrdoob/threejs/three.min.js' 'asset/vendor/threejs/three.min.js'"
-        ]
+    "require": {
+        "oomphinc/composer-installers-extender": "^2.0",
+        "mrdoob/threejs": "127"
+    },
+    "extra": {
+        "installer-types": ["omeka-addon-asset"],
+        "installer-paths": {
+            "asset/vendor/{$name}/": [
+                "type:omeka-addon-asset"
+            ]
+        }
     }
 }
