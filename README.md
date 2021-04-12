@@ -44,6 +44,14 @@ It's a royalty-free publishing 3D format designed for sharing and web, unlike
 many other 3D formats that are designed for edition. It is supported by all
 professional 3D softwares, all big companies, and all browsers. Not that only
 the version 2.0 of the format is supported. The version 1.0 was based on WebGL.
+Lossloss conversion from version 1.0 to version 2.0 can be done with common
+tools.
+
+The glTF format has two variants: a single binary file (`.glb`) or a main json
+file (`.gltf`) and related files (images, textures, etc.). The first one is
+simpler to manage because the model is a single file. The second can be updated
+easily, at least outside of Omeka, but is harder to manage and requires absolute
+urls or module [Archive Repertory] (see below).
 
 The internal format of threejs is supported too, but only if it is internally
 based on glTF v2, so it is not recommended.
@@ -62,6 +70,9 @@ Apache config or in the file `.htaccess` at the root of Omeka:
 </IfModule>
 ```
 
+Some other formats may be supported or not: Collada (`.dae`), FilmBox (`.fbx`),
+Object (`.obj`), but they were less checked.
+
 ### Cors
 
 To share the files with other servers, the server may need to allow CORS.
@@ -70,16 +81,17 @@ To share the files with other servers, the server may need to allow CORS.
 
 By default, the 3D models are not allowed in the default global settings. The
 module adds them during install, but if they are removed, you have to re-add
-them:
+them in the admin settings:
 
-- extension `.glb` and media type `model/gltf-binary` (single file glTF);
-- extension `.gltf` and media type `model/gltf+json` (main file of a glTF media);
-- extension `.ktx2` and media type `image/ktx2` (textures of a glTF);
-- extension `.json` and media types `application/vnd.threejs+json` (main file of
-  a threejs media, that is a format based on gltf);
-- extension `.json` and media type `application/json` (to manage the case where
-  the files are identified as json, instead of a 3D model);
-- extension `.bin` and media type `application/octet-stream` (binary file).
+Media-types:
+```
+application/octet-stream, application/vnd.threejs+json, model/gltf-binary, model/gltf+json, model/obj, model/vnd.collada+xml, model/vnd.filmbox, image/ktx2, model/mtl
+```
+
+Extensions:
+```
+bin, dae, fbx, glb, gltf, json, ktx2, mtl, obj
+```
 
 In some cases, if you use single file, the `.glb` files or the related `.bin`
 are identified as `application/octet-stream`, that means that they are not
@@ -154,6 +166,35 @@ and the original filename should be "thumb", "thumbnail", "screenshot",
 or "webp". This name allows to make the distinction between the thumbnail and
 the textures that belong to the item.
 
+### Specific config
+
+When a model doesn't contain all the required data to build a scene, in
+particular the background, the controls, the lights and the camera, it is
+possible to config it in a property. This property is defined main settings,
+then each model can contain a specific config. The value must be a media one,
+not an item one. The value should be a well formatted json, so check commas and
+double quotes, or check on [JsonFormatter] or a similar site. The default data
+are:
+
+```json
+{
+    "background": "white",
+    "controls": "OrbitControls",
+    "camera": {
+        "position": {
+            "x": 0,
+            "y": 10,
+            "z": 20
+        },
+        "lookAt": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    }
+}
+```
+
 ### Examples
 
 #### Example with glTF
@@ -195,6 +236,10 @@ above) and requires the module [Archive Repertory].
 This format seems to be not really documented, but it looks like based on glTF.
 For this version of ThreeJs, the files must be based on glTF v2.0, so a
 conversion is required for old examples. The example below is an old example.
+
+***IMPORTANT***: The json file in the example below is based on glTF v1.0 and
+must be upgraded to a newer version in order to be displayed with the last
+release of [Three JS].
 
 - Create a new item with the following metadata:
   - Title: The Kiss
@@ -288,12 +333,14 @@ Module Model Viewer for Omeka S:
 [three.js]: https://threejs.org/
 [ModelViewer.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/releases
 [threejs]: https://threejs.org
+[Three JS]: https://threejs.org
 [clam av]: https://www.clamav.net
 [17 files]: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/FlightHelmet
 [glTF]: https://en.wikipedia.org/wiki/GlTF
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
+[JsonFormatter]: https://jsonformatter.org
 [see example]: https://www.morphosource.org/manifests/1fbaa268-b02f-4b46-a249-cef46bcbe04c
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
