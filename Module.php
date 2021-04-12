@@ -27,7 +27,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace ThreeJs;
+namespace ModelViewer;
 
 if (!class_exists(\Generic\AbstractModule::class)) {
     require file_exists(dirname(__DIR__) . '/Generic/AbstractModule.php')

@@ -1,5 +1,5 @@
 @media screen {
-    .threejs canvas {
+    .model canvas {
         height: 100%;
         width: 100%;
     }

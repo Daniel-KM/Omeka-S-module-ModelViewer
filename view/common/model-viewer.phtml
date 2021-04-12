@@ -47,7 +47,7 @@ if ($resource instanceof \Omeka\Api\Representation\ItemRepresentation) {
     return;
 }
 
-$options['id'] = $options['id'] ?? ($media ? 'threejs-' . $media->id() : 'threejs-0');
+$options['id'] = $options['id'] ?? ($media ? 'model-' . $media->id() : 'model-0');
 $options['source'] = empty($options['source']) ? $media->originalUrl() : $options['source'];
 $options['dirpath'] = dirname($options['source']) . '/';
 $options['filename'] = basename($options['source']);
@@ -55,10 +55,10 @@ $options['mediaType'] = $mediaType;
 
 $optionsJson = json_encode($options, 448);
 $script = <<<JS
-if (typeof threejsOptions === 'undefined') {
-    var threejsOptions = [];
+if (typeof modelViewerOptions === 'undefined') {
+    var modelViewerOptions = [];
 }
-threejsOptions.push($optionsJson);
+modelViewerOptions.push($optionsJson);
 JS;
 $this->headScript()
     ->appendScript($script);

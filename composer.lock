@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "427d83ee370c218026108aab847c8876",
+    "content-hash": "5252821f3c92de8d63f590e148f1c9a8",
     "packages": [
         {
             "name": "mrdoob/threejs",

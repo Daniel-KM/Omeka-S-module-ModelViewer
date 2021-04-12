@@ -5,11 +5,11 @@
 document.addEventListener('DOMContentLoaded', function(event) {
 
     // The config is defined inside the html.
-    if (typeof threejsOptions === 'undefined') {
+    if (typeof modelViewerOptions === 'undefined') {
         return;
     }
 
-    function prepareThreeJs(options) {
+    function prepareThreeJs( options ) {
         // TODO Use page background color (or "white" or "lightgray" or #181818 or anything else).
         const background = 'white';
 
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         main();
     }
 
-    threejsOptions.forEach(function (options, index) {
+    modelViewerOptions.forEach(function (options, index) {
         prepareThreeJs(options);
     });
 

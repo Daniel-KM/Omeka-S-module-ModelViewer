@@ -1,5 +1,5 @@
 {
-    "name": "daniel-km/omeka-s-module-threejs",
+    "name": "daniel-km/omeka-s-module-modelviewer",
     "description": "Integrates the Three js viewer in order to display 3D models.",
     "type": "library",
     "license": "CECILL-2.1",

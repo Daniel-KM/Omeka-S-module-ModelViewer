@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace ThreeJs;
+namespace ModelViewer;
 
 return [
     'view_manager' => [
@@ -10,16 +10,15 @@ return [
     ],
     'file_renderers' => [
         'invokables' => [
-            'threeJs' => Media\FileRenderer\ThreeJs::class,
+            'model' => Media\FileRenderer\ModelRenderer::class,
         ],
         'aliases' => [
-            'threejs' => 'threeJs',
-            'model/gltf-binary' => 'threeJs',
-            'model/gltf+json' => 'threeJs',
-            'application/vnd.threejs+json' => 'threeJs',
+            'model/gltf-binary' => 'model',
+            'model/gltf+json' => 'model',
+            'application/vnd.threejs+json' => 'model',
             // TODO Add all media types supported by three js.
         ],
     ],
-    'threejs' => [
+    'modelviewer' => [
     ],
 ];

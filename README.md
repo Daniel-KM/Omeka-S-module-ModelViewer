@@ -1,8 +1,8 @@
-Three js Model viewer (module for Omeka S)
-==========================================
+Model viewer (module for Omeka S)
+=================================
 
-[Three js Model viewer] is a module for [Omeka S] that integrates [three.js], a
-a 3D viewer.
+[Model viewer] is a module for [Omeka S] that integrates [three.js], a viewer
+for 3D models.
 
 
 Installation
@@ -13,13 +13,13 @@ install it, or use and init the source.
 
 * From the zip
 
-Download the last release [ThreeJs.zip] from the list of releases (the master
+Download the last release [ModelViewer.zip] from the list of releases (the master
 does not contain the dependency), and uncompress it in the `modules` directory.
 
 * From the source and for development:
 
 If the module was installed from the source, rename the name of the folder of
-the module to `ThreeJs`, and go to the root module, and run:
+the module to `ModelViewer`, and go to the root module, and run:
 
 ```sh
 composer install --no-dev
@@ -214,23 +214,20 @@ has an issue with its certificate.
 
 ### Display in themes
 
-To embed the Three js model viewer somewhere else, just use the helper:
+To embed the model viewer somewhere else, just use the helper:
 
 ```php
     // Display the viewer with the specified item (or media) and specified options.
     // The options for the viewer are directly passed to the partial, so they are
     // available in the theme and set for the viewer.
-    echo $this->threeJs($item, $options);
-
-    // Display multiple resources (items and/or item sets).
-    echo $this->threeJs($resources);
+    echo $this->modelViewer($item, $options);
 ```
 
 TODO
 ----
 
 - [ ] Manage all 3D formats (in iiif [see example] or https://iiif-3d-manifests.netlify.app and in the viewer (https://github.com/edsilv/virtex/tree/master/src)).
-- [ ] Store the json precise type (model/gltf+json and model/vnd.threejs?) in media during import or via a job (see module ExtractOcr for xml).
+- [ ] Store the json precise type (model/gltf+json) in media during import or via a job (see module ExtractOcr for xml).
 - [ ] Manage subdirectories with module Archive Repertory.
 
 
@@ -281,15 +278,15 @@ Widget [Three JS]:
 
 * See copyright on the site [threejs.org]
 
-Module Three JS for Omeka S:
+Module Model Viewer for Omeka S:
 
 * Copyright Daniel Berthereau, 2021 (see [Daniel-KM])
 
 
-[Three js Model viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-ThreeJs
+[Model viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer
 [Omeka S]: https://omeka.org/s
 [three.js]: https://threejs.org/
-[ThreeJs.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-ThreeJs/-/releases
+[ModelViewer.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/releases
 [threejs]: https://threejs.org
 [clam av]: https://www.clamav.net
 [17 files]: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/FlightHelmet
@@ -298,7 +295,7 @@ Module Three JS for Omeka S:
 [Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
 [see example]: https://www.morphosource.org/manifests/1fbaa268-b02f-4b46-a249-cef46bcbe04c
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-ThreeJs/-/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org

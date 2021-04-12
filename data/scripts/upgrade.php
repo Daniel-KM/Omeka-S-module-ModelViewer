@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace ThreeJs;
+namespace ModelViewer;
 
 /**
  * @var Module $this
