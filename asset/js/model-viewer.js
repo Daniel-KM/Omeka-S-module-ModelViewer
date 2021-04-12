@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
     }
 
     function prepareThreeJs( options ) {
-        // TODO Use page background color (or "white" or "lightgray" or #181818 or anything else).
-        const background = 'white';
+        const background = options.config && options.config.background && options.config.background.length
+            ? options.config.background : 'white';
 
         const container = document.getElementById( options.id );
         const canvas = document.querySelector( '#' + options.id + ' canvas' );
@@ -35,10 +35,22 @@ document.addEventListener('DOMContentLoaded', function(event) {
             const near = 0.01;
             const far = 10000;
             const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
-            camera.position.set( 0, 10, 20 );
+            options.config && options.config.camera && options.config.camera.position && options.config.camera.position.length
+                ? camera.position.set( options.config.camera.position.x, options.config.camera.position.y, options.config.camera.position.z )
+                : camera.position.set( 0, 10, 20 );
+            options.config && options.config.camera && options.config.camera.lookAt && options.config.camera.lookAt.length
+                ? camera.lookAt( options.config.camera.lookAt.x, options.config.camera.lookAt.y, options.config.camera.lookAt.z )
+                : camera.lookAt( 0, 0, 0 );
 
-            const controls = new THREE.OrbitControls( camera, canvas );
-            controls.target.set( 0, 5, 0 );
+            var controls;
+            if (options.config && options.config.controls && options.config.controls === 'FirstPersonControls') {
+                controls = new THREE.FirstPersonControls( camera, renderer.domElement );
+                controls.movementSpeed = 100;
+                controls.lookSpeed = 0.05;
+            } else {
+                controls = new THREE.OrbitControls( camera, canvas );
+                controls.target.set( 0, 5, 0 );
+            }
             controls.update();
 
             {
@@ -120,7 +132,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
                             frameArea(boxSize, boxSize, boxCenter, camera);
 
                             controls.maxDistance = boxSize * 100;
-                            controls.target.copy( boxCenter );
+                            if (controls.target) {
+                                controls.target.copy( boxCenter );
+                            }
                             controls.update();
                         },
                         onLoaderProgress,
@@ -161,7 +175,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
             function render() {
                 if (resizeRendererToDisplaySize( renderer )) {
-                    const canvas = renderer.domElement;
                     camera.aspect = container.clientWidth / container.clientHeight;
                     camera.updateProjectionMatrix();
                 }
@@ -178,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
     }
 
     modelViewerOptions.forEach(function (options, index) {
+        console.log(options);
         prepareThreeJs(options);
     });
 

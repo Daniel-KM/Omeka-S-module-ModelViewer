@@ -71,6 +71,11 @@ class Module extends AbstractModule
             'view.show.after',
             [$this, 'handleViewShowAfterItem']
         );
+        $sharedEventManager->attach(
+            \Omeka\Form\SettingForm::class,
+            'form.add_elements',
+            [$this, 'handleMainSettings']
+        );
     }
 
     public function handleViewShowAfterItem(Event $event): void

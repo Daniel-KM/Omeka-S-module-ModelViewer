@@ -5,11 +5,27 @@
  * @var array $options
  */
 
-// Can be used directly or through media file rendering.
+// Can be used directly with an item or through media file rendering, so some checks are added.
 $resource = $resource ?? null;
 $options = $options ?? [];
+if (empty($options['config'])) {
+    $options['config'] = [
+        // Use page background color (or "white" or "lightgray" or #181818 or anything else).
+        'background' => 'white',
+        'controls' => 'OrbitControls',
+        'camera' => [
+            'position' => ['x' => 0, 'y' => 10, 'z' => 20],
+            'lookAt' => ['x' => 0, 'y' => 0, 'z' => 0],
+        ],
+    ];
+}
 
-$supported = ['model/gltf-binary', 'model/gltf+json', 'application/vnd.threejs+json', 'application/octet-stream'];
+$supported = [
+    'model/gltf-binary',
+    'model/gltf+json',
+    'application/vnd.threejs+json',
+    'application/octet-stream',
+];
 
 $media = null;
 if ($resource instanceof \Omeka\Api\Representation\ItemRepresentation) {
@@ -33,8 +49,10 @@ if ($resource instanceof \Omeka\Api\Representation\ItemRepresentation) {
     if (!in_array($mediaType, $supported)) {
         return;
     }
-    if ($mediaType === 'application/octet-stream' && $media->extension() !== 'glb') {
-        return;
+    if ($mediaType === 'application/octet-stream') {
+        if ($media->extension() !== 'glb') {
+            return;
+        }
     }
     $media = $resource;
 } elseif (empty($options['source'])) {
