@@ -57,6 +57,13 @@ class Module extends AbstractModule
                 ) . ' '
                 . $t->translate('See module’s installation documentation.')); // @translate
         }
+
+        $messenger = new Messenger();
+        $message = new Message(
+            'If your files are not recognized as model, install module Next.' // @translate
+                . ' ' . $t->translate('See module’s installation documentation.') // @translate
+        );
+        $messenger->addWarning($message);
     }
 
     protected function postInstall(): void

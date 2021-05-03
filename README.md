@@ -9,7 +9,8 @@ Installation
 ------------
 
 The module uses an external library [three.js], so use the release zip to
-install it, or use and init the source.
+install it, or use and init the source. Furthermore, it is recommended to
+install the module [Next] (see below).
 
 * From the zip
 
@@ -100,6 +101,15 @@ be a malware), you need to disable the file validation in the global settings.
 Don't forget to reenable it after upload, because it is a security issue, or add
 other security checks somewhere else, in particular during authentication or
 with a server virus scanner (generally the [clam av] on Linux server).
+
+### Identification of xml Collada files
+
+Because Collada files are xml files, they are not automatically recognized by
+Omeka.
+
+To identify them, there are two solutions: use the file extension `.dae` or
+install the module [Next], that identify the xml-dae files with the vendor media
+type `model/vnd.collada+xml`.
 
 ### Size warning
 
