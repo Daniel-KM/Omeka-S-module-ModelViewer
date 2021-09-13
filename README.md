@@ -10,7 +10,8 @@ Installation
 
 The module uses an external library [three.js], so use the release zip to
 install it, or use and init the source. Furthermore, it is recommended to
-install the module [Next] (see below).
+install the modules [Bulk Edit] when your files are `gltf`, and [Xml Viewer]
+when your files are Collada `dae` (see below).
 
 * From the zip
 
@@ -45,7 +46,7 @@ It's a royalty-free publishing 3D format designed for sharing and web, unlike
 many other 3D formats that are designed for edition. It is supported by all
 professional 3D softwares, all big companies, and all browsers. Not that only
 the version 2.0 of the format is supported. The version 1.0 was based on WebGL.
-Lossloss conversion from version 1.0 to version 2.0 can be done with common
+Lossless conversion from version 1.0 to version 2.0 can be done with common
 tools.
 
 The glTF format has two variants: a single binary file (`.glb`) or a main json
@@ -108,8 +109,16 @@ Because Collada files are xml files, they are not automatically recognized by
 Omeka.
 
 To identify them, there are two solutions: use the file extension `.dae` or
-install the module [Next], that identify the xml-dae files with the vendor media
-type `model/vnd.collada+xml`.
+install the module [Xml Viewer], that identify the xml-dae files with the vendor
+media type `model/vnd.collada+xml`.
+
+### Identification of files (json...)
+
+In other case, you may need to update directly the media-type of each file. You
+can use the module [Bulk Edit] that adds this feature in the batch edit in item/browse
+and media/browse.
+
+It is important in particular to convert the `application/json` into `model/gltf+json`.
 
 ### Size warning
 
@@ -345,6 +354,8 @@ Module Model Viewer for Omeka S:
 [threejs]: https://threejs.org
 [Three JS]: https://threejs.org
 [clam av]: https://www.clamav.net
+[Xml Viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-XmlViewer
+[Bulk Edit]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkEdit
 [17 files]: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/FlightHelmet
 [glTF]: https://en.wikipedia.org/wiki/GlTF
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory

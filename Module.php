@@ -39,6 +39,8 @@ use Generic\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Omeka\Module\Exception\ModuleCannotInstallException;
+use Omeka\Mvc\Controller\Plugin\Messenger;
+use Omeka\Stdlib\Message;
 
 class Module extends AbstractModule
 {
@@ -46,10 +48,11 @@ class Module extends AbstractModule
 
     protected function preInstall(): void
     {
+        $services = $this->getServiceLocator();
+        $t = $services->get('MvcTranslator');
+
         $js = __DIR__ . '/asset/vendor/threejs/three.min.js';
         if (!file_exists($js)) {
-            $services = $this->getServiceLocator();
-            $t = $services->get('MvcTranslator');
             throw new ModuleCannotInstallException(
                 sprintf(
                     $t->translate('The library "%s" should be installed.'), // @translate
@@ -60,7 +63,7 @@ class Module extends AbstractModule
 
         $messenger = new Messenger();
         $message = new Message(
-            'If your files are not recognized as model, install module Next.' // @translate
+            'If your json and xml files are not recognized as model, install modules Bulk Edit and/or Xml Viewer.' // @translate
                 . ' ' . $t->translate('See module’s installation documentation.') // @translate
         );
         $messenger->addWarning($message);
