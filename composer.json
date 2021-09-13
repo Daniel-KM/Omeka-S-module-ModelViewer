@@ -21,6 +21,7 @@
         "3D viewer",
         "model viewer",
         "gltf",
+        "glb",
         "dae",
         "fbx"
     ],
@@ -29,19 +30,19 @@
             "type": "package",
             "package": {
                 "name": "mrdoob/threejs",
-                "version": "127",
+                "version": "132",
                 "type": "omeka-addon-asset",
                 "dist": {
                     "type": "tar",
-                    "url": "https://github.com/Daniel-KM/Omeka-S-module-ModelViewer/releases/download/3.3.0.3-127/threejs.tar.gz",
-                    "reference": "3.3.0.2-127"
+                    "url": "https://github.com/Daniel-KM/Omeka-S-module-ModelViewer/releases/download/3.3.0.4-132/threejs.tar.gz",
+                    "reference": "3.3.0.4-132"
                 }
             }
         }
     ],
     "require": {
         "oomphinc/composer-installers-extender": "^2.0",
-        "mrdoob/threejs": "127"
+        "mrdoob/threejs": "132"
     },
     "extra": {
         "installer-types": ["omeka-addon-asset"],
