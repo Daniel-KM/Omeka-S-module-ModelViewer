@@ -150,11 +150,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // Do not use.
         // renderer.physicallyCorrectLights = true;
 
+
         //====== //
         // Sizes //
         // ===== //
 
-        // TODO Check previous code where there is a computation of the optimal size for the camera (globally and each object).
+        // TODO Check previous code where there is a computation of the optimal size (frameArea) for the camera (globally and each object).
 
         let sizes = {};
 
@@ -162,9 +163,58 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // Cameras //
         // ======= //
 
-        const camera = new THREE.PerspectiveCamera(100, 0, 0.1, 1000);
-        camera.position.set(50, 50, 80);
-        scene.add(camera);
+        const defaultCameras = [
+            {
+                type: 'PerspectiveCamera',
+                fov: 50,
+                aspect: 1,
+                near: 0.1,
+                far: 2000,
+                position: {x: 50, y: 50, z: 80},
+                lookAt: {x: 0, y: 0, z: 0},
+            }
+        ];
+        var cameras = options.config && options.config.cameras && options.config.cameras.length
+            ? options.config.cameras
+            : defaultCameras;
+        if (!(cameras instanceof Array)) {
+            cameras = [cameras];
+        }
+
+        cameras.forEach((camera, index) => {
+            const near = typeof camera.near === 'undefined' ? 0.1 : camera.near;
+            const far = typeof camera.far === 'undefined' ? 2000 : camera.far;
+            const position = typeof camera.position === 'undefined' ? {x: 50, y: 50, z: 80} : camera.position;
+            const lookAt = typeof camera.lookAt === 'undefined' ? {x: 0, y: 0, z: 0} : camera.lookAt;
+            if (camera.type === 'PerspectiveCamera') {
+                const fov = typeof camera.fov === 'undefined' ? 50 : camera.fov;
+                const aspect = typeof camera.aspect === 'undefined' ? 1 : camera.aspect;
+                camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+                camera.position.set(position.x, position.y, position.z);
+                camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
+                scene.add(camera);
+                cameras[index] = camera;
+            } else if (camera.type === 'OrthographicCamera') {
+                const left = typeof camera.left === 'undefined' ? -100 : camera.left;
+                const right = typeof camera.right === 'undefined' ? 100 : camera.right;
+                const top = typeof camera.top === 'undefined' ? 100 : camera.top;
+                const bottom = typeof camera.bottom === 'undefined' ? -100 : camera.bottom;
+                camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+                camera.position.set(position.x, position.y, position.z);
+                camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
+                scene.add(camera);
+                cameras[index] = camera;
+            }
+        });
+
+        var camera = cameras[0];
+        if (typeof camera !== 'object' || !(camera instanceof THREE.Camera)) {
+            console.log('Using default camera.');
+            camera = new THREE.PerspectiveCamera();
+            camera.position.set(50, 50, 80);
+            camera.lookAt(0, 0, 0);
+            scene.add(camera);
+        }
 
         // ====== //
         // Meshes //
@@ -552,6 +602,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     control.enabled = true;
                 }
             }, animationDuration * 1000);
+        }
+
+        if (!options.config.animation) {
+            lockCamera = false;
+            if (control != undefined) {
+                control.enabled = true;
+            }
         }
 
         // ==== //

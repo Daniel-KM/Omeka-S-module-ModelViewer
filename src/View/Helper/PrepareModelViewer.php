@@ -14,10 +14,10 @@ class PrepareModelViewer extends AbstractHelper
     protected $defaultConfig = [
         // Use page background color (or "white" or "lightgray" or #181818 of #363636 or anything else).
         'background' => 'white',
-        'camera' => [
+        'cameras' => [[
             'position' => ['x' => 0, 'y' => 10, 'z' => 20],
             'lookAt' => ['x' => 0, 'y' => 0, 'z' => 0],
-        ],
+        ]],
     ];
 
     /**
