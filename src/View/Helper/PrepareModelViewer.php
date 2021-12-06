@@ -8,6 +8,19 @@ use Omeka\Api\Representation\MediaRepresentation;
 
 class PrepareModelViewer extends AbstractHelper
 {
+   /**
+    * @var array
+    */
+    protected $defaultConfig = [
+        // Control is Orbit by default.
+        // Use page background color (or "white" or "lightgray" or #181818 or anything else).
+        'background' => 'white',
+        'camera' => [
+            'position' => ['x' => 0, 'y' => 10, 'z' => 20],
+            'lookAt' => ['x' => 0, 'y' => 0, 'z' => 0],
+        ],
+    ];
+
     /**
      * Get all options for the model viewer (threejs) and init css/js.
      *
@@ -18,18 +31,29 @@ class PrepareModelViewer extends AbstractHelper
      * @param array $options
      * @return array|null Returns null in case of error.
      */
-    public function __invoke(?AbstractResourceEntityRepresentation$resource, array $options = []): ?array
+    public function __invoke(?AbstractResourceEntityRepresentation $resource, array $options = []): ?array
     {
-        if (empty($options['config'])) {
-            $options['config'] = [
-                // Use page background color (or "white" or "lightgray" or #181818 or anything else).
-                'background' => 'white',
-                'controls' => 'OrbitControls',
-                'camera' => [
-                    'position' => ['x' => 0, 'y' => 10, 'z' => 20],
-                    'lookAt' => ['x' => 0, 'y' => 0, 'z' => 0],
-                ],
-            ];
+        static $commonConfig;
+        static $property;
+
+        $view = $this->getView();
+
+        // Merge config: theme, then media, site, global, default.
+        // TODO No site setting for now.
+        if (!$commonConfig) {
+            $setting = $view->plugin('setting');
+            $mainConfig = $setting('modelviewer_config_default');
+            if ($mainConfig) {
+                $mainConfig = json_decode($mainConfig, true);
+                if (!is_array($mainConfig)) {
+                    $mainConfig = [];
+                    $view->logger()->warn('[Model viewer]: Main config is not a valid json.'); // @translate
+                }
+            } else {
+                $mainConfig = [];
+            }
+            $commonConfig = array_replace($this->defaultConfig, $mainConfig);
+            $property = $setting('modelviewer_config_property');
         }
 
         $supported = [
@@ -95,10 +119,10 @@ class PrepareModelViewer extends AbstractHelper
         // TODO Only the id, the source, the config and eventually the media type are needed.
         $options['id'] = $options['id'] ?? ($media ? 'model-' . $media->id() : 'model-0');
         $options['source'] = empty($options['source']) ? $media->originalUrl() : $options['source'];
-        $options['dirpath'] = dirname($options['source']) . '/';
-        $options['filename'] = basename($options['source']);
+        // $options['dirpath'] = dirname($options['source']) . '/';
+        // $options['filename'] = basename($options['source']);
         $options['mediaType'] = $mediaType;
-        $options['extension'] = $media ? $media->extension() : null;
+        // $options['extension'] = $media ? $media->extension() : null;
         // A special option to load materials for collada or .obj.
         $options['mtl'] = $options['mtl'] ?? [];
 
@@ -113,9 +137,25 @@ class PrepareModelViewer extends AbstractHelper
             }
         }
 
+        $config = $commonConfig;
+
+        if ($property) {
+            $mediaConfig = $media->value($property);
+            if ($mediaConfig) {
+                $mediaConfig = json_decode($mediaConfig->value(), true);
+                if (is_array($mediaConfig)) {
+                    $config = array_replace($config, $mediaConfig);
+                } else {
+                    $view->logger()->warn(sprintf('[Model viewer]: Specific config for media %d is not a valid json.', $media->id())); // @translate
+                }
+            }
+        }
+
+        $options['config'] = array_replace($config, $options['config'] ?? []);
+
         $this->initAssets($media, $options);
 
-        unset($options['config]']['import']);
+        unset($options['config']['import']);
 
         return $options;
     }
@@ -127,9 +167,6 @@ class PrepareModelViewer extends AbstractHelper
     {
         static $hasModelViewer = false;
         static $jsFiles = [];
-
-        static $config = [];
-        static $property = null;
         static $assetUrl;
         static $headScript;
 
@@ -138,13 +175,6 @@ class PrepareModelViewer extends AbstractHelper
         $mediaType = $options['mediaType'];
 
         if (!$hasModelViewer) {
-            $setting = $view->plugin('setting');
-            $config = $setting('modelviewer_config_default', []) ?: [];
-            if ($config) {
-                $config = json_decode($config, true) ?: [];
-            }
-            $property = $setting('modelviewer_config_property');
-
             $assetUrl = $view->plugin('assetUrl');
             $view->headLink()
                 ->appendStylesheet($assetUrl('css/model-viewer.css', 'ModelViewer'));
@@ -170,7 +200,6 @@ class PrepareModelViewer extends AbstractHelper
             case 'model/gltf-binary':
             case 'model/gltf+json':
             case 'model/gltf':
-                $mediaType = 'model/gltf';
                 if (isset($jsFiles['loaders/GLTFLoader'])) {
                     $headScript
                         ->appendFile($assetUrl('vendor/threejs/js/loaders/GLTFLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
@@ -235,21 +264,6 @@ class PrepareModelViewer extends AbstractHelper
                 $headScript
                     ->appendFile($assetUrl('vendor/threejs/js/loaders/MTLLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
                 $jsFiles['loaders/MTLLoader'] = null;
-            }
-        }
-
-        if (empty($options['config'])) {
-            $options['config'] = $config;
-            if ($media && $property) {
-                $configValues = $media->value($property);
-                if ($configValues) {
-                    $configValues = json_decode($configValues->value(), true);
-                    if (is_array($configValues)) {
-                        $options['config'] = $configValues;
-                    } else {
-                        $view->logger()->warn(sprintf('[Model viewer]: Specific config for media %d is not a valid json.', $media->id())); // @translate
-                    }
-                }
             }
         }
 
