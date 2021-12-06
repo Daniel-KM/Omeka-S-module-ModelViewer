@@ -57,8 +57,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // ====== //
 
         const manager = new THREE.LoadingManager();
-        const loader = new THREE.GLTFLoader(manager);
-
         const progressLoader = document.createElement('div');
         {
             progressLoader.className = 'loader';
@@ -78,9 +76,23 @@ document.addEventListener('DOMContentLoaded', function(event) {
             progressLoader.appendChild(progress);
             viewerElement.appendChild(progressLoader);
 
-            manager.onProgress = function (item, loaded, total) {
-                progressBar.style.width = (loaded / total * 100) + '%';
-            }
+            manager
+                .onProgress = function (item, loaded, total) {
+                    progressBar.style.width = (loaded / total * 100) + '%';
+                };
+            manager
+                .onError = function (url) {
+                    // The errors are already in the console.
+                    if (viewerElement.getElementsByTagName('canvas').length) {
+                        viewerElement.innerHTML = 'Cannot load:';
+                        viewerElement.style.height = 'auto';
+                        viewerElement.style.color = '#a91919';
+                        viewerElement.style.display = 'block';
+                        viewerElement.classList.add('error');
+                        viewerElement.innerHTML +='<ul></ul>';
+                    }
+                    viewerElement.getElementsByTagName('ul')[0].innerHTML += '<li>' + url + "</li>\n";
+                };
         }
 
         // ======= //
@@ -142,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // Sizes //
         // ===== //
 
-        // TODO Check previous code where there is a computation of the optimal size for the camera.
+        // TODO Check previous code where there is a computation of the optimal size for the camera (globally and each object).
 
         let sizes = {};
 
@@ -162,37 +174,145 @@ document.addEventListener('DOMContentLoaded', function(event) {
         anisotropy = renderer.capabilities.getMaxAnisotropy();
 
         let model;
-        loader.load(modelSource, gltf => {
-            model = gltf.scene;
-            model.scale.set(modelScale, modelScale, modelScale);
 
-            model.traverse((child) => {
-                if (child instanceof THREE.Mesh) {
-                    child.material = new THREE.MeshStandardMaterial({
-                        map: child.material.map,
-                    });
-                    if (child.material.map) {
-                        // child.material.map.magFilter = THREE.NearestFilter;
-                        // child.material.map.minFilter = THREE.LinearMipMapLinearFilter;
-                        child.material.map.anisotropy = anisotropy / 2;
-                        child.material.side = THREE.DoubleSide;
+        if (!options.mediaType
+            || options.mediaType === 'model/gltf-binary'
+            || options.mediaType === 'model/gltf+json'
+            || options.mediaType === 'model/gltf'
+        ) {
+            const loader = new THREE.GLTFLoader(manager);
+            loader
+                .load(
+                    modelSource,
+                    gltf => {
+                        model = gltf.scene;
+                        model.scale.set(modelScale, modelScale, modelScale);
+
+                        model.traverse((child) => {
+                            if (child instanceof THREE.Mesh) {
+                                child.material = new THREE.MeshStandardMaterial({
+                                    map: child.material.map,
+                                });
+                                if (child.material.map) {
+                                    // child.material.map.magFilter = THREE.NearestFilter;
+                                    // child.material.map.minFilter = THREE.LinearMipMapLinearFilter;
+                                    child.material.map.anisotropy = anisotropy / 2;
+                                    child.material.side = THREE.DoubleSide;
+                                }
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        });
+
+                        setTimeout(() => {
+                            animateCamera();
+                            progressLoader.style.opacity = 0;
+                            setTimeout(() => {
+                                 progressLoader.style.display = 'none';
+                                 if (viewerElement.getElementsByClassName('loader').length) {
+                                     viewerElement.removeChild(progressLoader);
+                                }
+                            }, 200);
+                        }, 1000);
+
+                        scene.add(model);
                     }
-                    child.castShadow = true;
-                    child.receiveShadow = true;
+                );
+        } else if (options.mediaType === 'model/obj') {
+            manager
+                .addHandler(/\.dds$/i, new DDSLoader());
+            if (options.mtl && options.mtl.length) {
+                new THREE.MTLLoader(manager)
+                    .load( options.mtl[0], function (materials) {
+                        materials.preload();
+                        new THREE.OBJLoader(manager)
+                            .setMaterials(materials)
+                            .load(
+                                options.source,
+                                function (object) {
+                                    scene.add(object);
+                                }
+                            );
+                    } );
+            } else {
+                new THREE.OBJLoader(manager)
+                    .load(
+                        options.source,
+                        function (object) {
+                            scene.add(object);
+                        }
+                    );
+            }
+        } else if (options.mediaType === 'model/vnd.collada+xml') {
+            let colladaScene;
+            manager
+                .onLoad = function() {
+                    scene.add(colladaScene);
+                };
+            if (options.mtl && options.mtl.length) {
+                new THREE.MTLLoader(manager)
+                    .load(
+                        options.mtl[0],
+                        function (materials) {
+                            materials.preload();
+                            new THREE.ColladaLoader(manager)
+                                .load(
+                                    options.source,
+                                    function (collada) {
+                                        colladaScene = collada.scene;
+                                    }
+                                );
+                        }
+                    );
+            } else {
+                const loader = new THREE.ColladaLoader(manager);
+                loader
+                    .load(
+                        options.source,
+                        collada => {
+                            colladaScene = collada.scene;
+                        }
+                    );
+            }
+        } else if (options.mediaType === 'model/vnd.filmbox') {
+            const loader = new THREE.FBXLoader();
+            loader.load(
+                options.source,
+                function (object) {
+                    const mixer = new THREE.AnimationMixer(object);
+                    const action = mixer.clipAction(object.animations[0]);
+                    action.play();
+                    object.traverse( function (child) {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    scene.add(object);
                 }
-            });
+            );
+        } else if (options.mediaType === 'application/vnd.threejs+json') {
+            const loader = new THREE.VRMLoader();
+            loader
+                .load(
+                    options.source,
+                    function (obj) {
+                        scene.add(obj);
 
-            setTimeout(() => {
-                animateCamera();
-                progressLoader.style.opacity = 0;
-                setTimeout(() => {
-                     progressLoader.style.display = 'none';
-                     viewerElement.removeChild(progressLoader);
-                }, 200);
-            }, 1000);
+                        const box = new THREE.Box3().setFromObject(obj);
+                        const boxSize = box.getSize(new THREE.Vector3()).length();
+                        const boxCenter = box.getCenter(new THREE.Vector3());
+                        frameArea(boxSize, boxSize, boxCenter, camera);
 
-            scene.add(model);
-        });
+                        controls.maxDistance = boxSize * 100;
+                        controls.target.copy(boxCenter);
+                        controls.update();
+                    }
+                );
+        } else {
+            console.log('Media type "' + options.mediaType + '" is unsupported currently.');
+            return;
+        }
 
         // ====== //
         // Lights //
