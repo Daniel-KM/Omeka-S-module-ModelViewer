@@ -38,11 +38,25 @@
                     "reference": "3.3.0.4-132"
                 }
             }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "greensock/gsap",
+                "version": "3.8.0",
+                "type": "omeka-addon-asset",
+                "dist": {
+                    "type": "file",
+                    "url": "https://raw.githubusercontent.com/greensock/GSAP/master/dist/gsap.min.js",
+                    "reference": "3.8.0"
+                }
+            }
         }
     ],
     "require": {
         "oomphinc/composer-installers-extender": "^2.0",
-        "mrdoob/threejs": "132"
+        "mrdoob/threejs": "132",
+        "greensock/gsap": "3.8.0"
     },
     "extra": {
         "installer-types": ["omeka-addon-asset"],

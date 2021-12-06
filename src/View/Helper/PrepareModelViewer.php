@@ -202,6 +202,11 @@ class PrepareModelViewer extends AbstractHelper
             }
         }
 
+        if (!empty($options['config']['gsap'])) {
+            $headScript
+                ->appendFile($assetUrl('vendor/gsap/gsap.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
+        }
+
         switch ($options['config']['controls'] ?? null) {
             default:
             case 'OrbitControl':

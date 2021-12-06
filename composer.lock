@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a5662d94664774a6e555477b52ad204c",
+    "content-hash": "c03c34ba1fa7da2d30cb958c2b8888f1",
     "packages": [
         {
             "name": "composer/installers",
@@ -158,6 +158,16 @@
             "time": "2021-09-13T08:19:44+00:00"
         },
         {
+            "name": "greensock/gsap",
+            "version": "3.8.0",
+            "dist": {
+                "type": "file",
+                "url": "https://raw.githubusercontent.com/greensock/GSAP/master/dist/gsap.min.js",
+                "reference": "3.8.0"
+            },
+            "type": "omeka-addon-asset"
+        },
+        {
             "name": "mrdoob/threejs",
             "version": "132",
             "dist": {
@@ -233,5 +243,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }
