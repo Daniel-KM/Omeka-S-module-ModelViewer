@@ -79,6 +79,14 @@ document.addEventListener('DOMContentLoaded', function(event) {
             }
         }
 
+        // ======= //
+        // Buttons //
+        // ======= //
+
+        let button = document.createElement('div');
+        button.className = 'model-button button-fullscreen';
+        viewerElement.appendChild(button);
+
         // ======== //
         // Renderer //
         // ======== //
@@ -300,6 +308,64 @@ document.addEventListener('DOMContentLoaded', function(event) {
             updateSizes();
         })
     }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement
+            && !document.msFullscreenElement
+            && !document.mozFullScreenElement
+            && !document.webkitFullscreenElement
+        ) {
+            $('body').addClass('fullscreen');
+            $(this).closest('.model-viewer').addClass('fullscreen');
+            $(this).closest('.model-viewer').css('height', '');
+            $(this).closest('.model-viewer').css('width', '');
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            } else {
+                alert('Fullscreen is not supported.');
+            }
+        } else {
+            exitFullscreen();
+        }
+    }
+
+    function exitFullscreen() {
+        if (!document.fullscreenElement
+            && !document.mozFullScreenElement
+            && !document.webkitFullscreenElement
+            && !document.msFullscreenElement
+        ) {
+            return;
+        }
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+
+    $('body').on('click', '.model-viewer .button-fullscreen', toggleFullscreen);
+
+    $(document).on('fullscreenchange', function () {
+        if (!(document.fullscreenElement
+            || document.msFullscreenElement
+            || document.mozFullScreenElement
+            || document.webkitFullscreenElement)
+        ) {
+            $('body').removeClass('fullscreen');
+            $('.model-viewer').removeClass('fullscreen');
+        }
+    });
 
     modelViewerOptions.forEach(function (options, index) {
         createScene(options);
