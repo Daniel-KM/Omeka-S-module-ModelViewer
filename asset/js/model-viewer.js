@@ -1,6 +1,6 @@
 "use strict";
 
-// Simplified from https://threejs.org/docs/#examples/en/loaders/GLTFLoader and https://threejsfundamentals.org/threejs/threejs-load-gltf.html.
+// Currently, the config is defined inside the html via js variable "modelViewerOptions".
 
 document.addEventListener('DOMContentLoaded', function(event) {
 
@@ -9,277 +9,268 @@ document.addEventListener('DOMContentLoaded', function(event) {
         return;
     }
 
-    function prepareThreeJs( options ) {
-        const background = options.config && options.config.background && options.config.background.length
-            ? options.config.background : 'white';
+    // console.log(modelViewerOptions);
 
-        const container = document.getElementById( options.id );
-        const canvas = document.querySelector( '#' + options.id + ' canvas' );
+    function createScene(options) {
 
-        if (!canvas) {
-            console.log('No canvas.');
+        // ===== //
+        // Setup //
+        // ===== //
+
+        const modelSource = options.source;
+        if (!modelSource) {
+            console.log('No source.');
             return;
         }
 
-        function main() {
-            const renderer = new THREE.WebGLRenderer({
-                canvas: canvas,
-                // TODO Disable antialias on low mobile devices.
-                antialias: true,
-            });
-
-            const scene = new THREE.Scene();
-
-            const clock = new THREE.Clock();
-            const fov = 45;
-            const aspect = container.clientWidth / container.clientHeight;
-            const near = 0.01;
-            const far = 10000;
-            const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
-            options.config && options.config.camera && options.config.camera.position && options.config.camera.position.length
-                ? camera.position.set( options.config.camera.position.x, options.config.camera.position.y, options.config.camera.position.z )
-                : camera.position.set( 0, 10, 20 );
-            options.config && options.config.camera && options.config.camera.lookAt && options.config.camera.lookAt.length
-                ? camera.lookAt( options.config.camera.lookAt.x, options.config.camera.lookAt.y, options.config.camera.lookAt.z )
-                : camera.lookAt( 0, 0, 0 );
-
-            var controls;
-            if (options.config && options.config.controls && options.config.controls === 'FirstPersonControls') {
-                controls = new THREE.FirstPersonControls( camera, renderer.domElement );
-                controls.movementSpeed = 100;
-                controls.lookSpeed = 0.05;
-            } else {
-                controls = new THREE.OrbitControls( camera, canvas );
-                controls.target.set( 0, 5, 0 );
-            }
-            controls.update();
-
-            {
-                const pmremGenerator = new THREE.PMREMGenerator( renderer );
-                scene.background = new THREE.Color( 'white' );
-                scene.environment = pmremGenerator.fromScene( scene ).texture;
-                scene.background = new THREE.Color( background );
-                renderer.outputEncoding = THREE.sRGBEncoding;
-                renderer.physicallyCorrectLights = true;
-                renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                renderer.gammaFactor = 2.2;
-            }
-
-            {
-                const color = 0xFFFFFF;
-                const intensity = 0.3;
-                const light = new THREE.AmbientLight( color, intensity );
-                scene.add( light );
-            }
-
-            {
-                const color = 0xFFFFFF;
-                const intensity = 1;
-                const light = new THREE.DirectionalLight( color, intensity );
-                light.position.set( 1, 1, 1 );
-                scene.add( light );
-            }
-
-            function frameArea( sizeToFitOnScreen, boxSize, boxCenter, camera ) {
-                const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
-                const halfFovY = THREE.MathUtils.degToRad( camera.fov * .5 );
-                const distance = halfSizeToFitOnScreen / Math.tan( halfFovY );
-                const direction = ( new THREE.Vector3() )
-                    .subVectors( camera.position, boxCenter )
-                    .multiply( new THREE.Vector3(1, 0, 1) )
-                    .normalize();
-                camera.position.copy( direction.multiplyScalar( distance ).add(boxCenter) );
-                camera.near = boxSize / 1000;
-                camera.far = boxSize * 1000;
-                camera.updateProjectionMatrix();
-                camera.lookAt( boxCenter.x, boxCenter.y, boxCenter.z );
-            }
-
-            const onLoaderProgress = function ( xhr ) {
-                var url = xhr.srcElement.responseURL;
-                var size = Math.floor( xhr.total / 1000 );
-                var progress = Math.floor( ( xhr.loaded / xhr.total ) * 100 );
-                console.log( `Loading ${url.substring(url.lastIndexOf('/') + 1)} (${size} KB) ${progress}%` );
-            }
-
-            const onLoaderError = function ( error ) {
-                console.log( error.toString() );
-                container.innerHTML = error.toString();
-                container.style.height = 'auto';
-                container.classList.add('error');
-            }
-
-            if (!options.mediaType
-                || options.mediaType === 'model/gltf-binary'
-                || options.mediaType === 'model/gltf+json'
-            ) {
-                const loader = new THREE.GLTFLoader();
-                loader
-                    .load(
-                        options.source,
-                        function ( gltf ) {
-                            scene.add( gltf.scene );
-
-                            gltf.animations;
-                            gltf.scene;
-                            gltf.scenes;
-                            gltf.cameras;
-                            gltf.asset;
-
-                            const box = new THREE.Box3().setFromObject( gltf.scene );
-                            const boxSize = box.getSize( new THREE.Vector3() ).length();
-                            const boxCenter = box.getCenter( new THREE.Vector3() );
-                            frameArea(boxSize, boxSize, boxCenter, camera);
-
-                            controls.maxDistance = boxSize * 100;
-                            if (controls.target) {
-                                controls.target.copy( boxCenter );
-                            }
-                            controls.update();
-                        },
-                        onLoaderProgress,
-                        onLoaderError
-                    );
-            } else if (options.mediaType === 'model/obj') {
-                const manager = new THREE.LoadingManager();
-                manager.addHandler( /\.dds$/i, new DDSLoader() );
-                if ( options.mtl && options.mtl.length ) {
-                    new THREE.MTLLoader( manager )
-                        .load( options.mtl[0], function ( materials ) {
-                            materials.preload();
-                            new THREE.OBJLoader( manager )
-                                .setMaterials( materials )
-                                .load(
-                                    options.source,
-                                    function ( object ) {
-                                        scene.add( object );
-                                    },
-                                    onLoaderProgress,
-                                    onLoaderError
-                                );
-                        } );
-                } else {
-                    new THREE.OBJLoader( manager )
-                        .load(
-                            options.source,
-                            function ( object ) {
-                                scene.add( object );
-                            },
-                            onLoaderProgress,
-                            onLoaderError
-                        );
-                }
-            } else if (options.mediaType === 'model/vnd.collada+xml') {
-                let colladaScene;
-                const loadingManager = new THREE.LoadingManager( function () {
-                    scene.add( colladaScene );
-                } );
-                if ( options.mtl && options.mtl.length ) {
-                    new THREE.MTLLoader( loadingManager )
-                        .load(
-                            options.mtl[0],
-                            function ( materials ) {
-                                materials.preload();
-                                new THREE.ColladaLoader( loadingManager )
-                                    .load(
-                                        options.source,
-                                        function ( collada ) {
-                                            colladaScene = collada.scene;
-                                        },
-                                        onLoaderProgress,
-                                        onLoaderError
-                                    );
-                            }
-                        );
-                } else {
-                    const loader = new THREE.ColladaLoader( loadingManager );
-                    loader
-                        .load(
-                            options.source,
-                            function ( collada ) {
-                                colladaScene = collada.scene;
-                            },
-                            onLoaderProgress,
-                            onLoaderError
-                        );
-                }
-            } else if (options.mediaType === 'model/vnd.filmbox') {
-                const loader = new THREE.FBXLoader();
-                loader.load(
-                    options.source,
-                    function ( object ) {
-                        mixer = new THREE.AnimationMixer( object );
-                        const action = mixer.clipAction( object.animations[ 0 ] );
-                        action.play();
-                        object.traverse( function ( child ) {
-                            if ( child.isMesh ) {
-                                child.castShadow = true;
-                                child.receiveShadow = true;
-                            }
-                        } );
-                        scene.add( object );
-                    },
-                    onLoaderProgress,
-                    onLoaderError
-                );
-            } else if (options.mediaType === 'application/vnd.threejs+json') {
-                const loader = new THREE.VRMLoader();
-                loader
-                    .load(
-                        options.source,
-                        function ( obj ) {
-                            scene.add( obj );
-
-                            const box = new THREE.Box3().setFromObject( obj );
-                            const boxSize = box.getSize( new THREE.Vector3() ).length();
-                            const boxCenter = box.getCenter( new THREE.Vector3() );
-                            frameArea( boxSize, boxSize, boxCenter, camera );
-
-                            controls.maxDistance = boxSize * 100;
-                            controls.target.copy( boxCenter );
-                            controls.update();
-                        },
-                        onLoaderProgress,
-                        onLoaderError
-                    );
-            } else {
-                console.log('Media type "' + options.mediaType + '" is unsupported currently.');
-                return;
-            }
-
-            function resizeRendererToDisplaySize( renderer ) {
-                const canvas = renderer.domElement;
-                const width = canvas.clientWidth;
-                const height = canvas.clientHeight;
-                const needResize = canvas.width !== width || canvas.height !== height;
-                if ( needResize ) {
-                    renderer.setSize( width, height, false );
-                }
-                return needResize;
-            }
-
-            function render() {
-                if (resizeRendererToDisplaySize( renderer )) {
-                    camera.aspect = container.clientWidth / container.clientHeight;
-                    camera.updateProjectionMatrix();
-                }
-
-                controls.update( clock.getDelta() );
-
-                renderer.render( scene, camera );
-
-                requestAnimationFrame( render );
-            }
-
-            requestAnimationFrame( render );
+        const viewerElement = document.getElementById(options.id);
+        if (!viewerElement) {
+            console.log('No container.');
+            return;
         }
 
-        main();
+        if (!document.querySelector('#' + options.id + ' canvas')) {
+            viewerElement.appendChild(document.createElement('canvas'));
+        }
+        const canvas = document.querySelector('#' + options.id + ' canvas');
+
+        const background = options.config && options.config.background && options.config.background.length
+            ? options.config.background : 'white';
+
+        const modelScale = options.config && options.config.modelScale
+            ? options.config.modelScale
+            : 1;
+
+        const pointLightPosition = options.config && options.config.pointLightPosition
+            ? options.config.pointLightPosition
+            : {x: 0, y: 50, z: 15};
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(background);
+
+        // ====== //
+        // Loader //
+        // ====== //
+
+        const manager = new THREE.LoadingManager();
+        const loader = new THREE.GLTFLoader(manager);
+
+        // ======== //
+        // Renderer //
+        // ======== //
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            // TODO Disable antialias on low mobile devices.
+            antialias: true,
+            alpha: true,
+        });
+        renderer.setClearColor(0x363636, 1);
+        renderer.shadowMap.enabled = true;
+
+        //====== //
+        // Sizes //
+        // ===== //
+
+        let sizes = {};
+
+        // ======= //
+        // Cameras //
+        // ======= //
+
+        const camera = new THREE.PerspectiveCamera(100, 0, 0.1, 1000);
+        camera.position.set(50, 50, 80);
+        scene.add(camera);
+
+        // ====== //
+        // Meshes //
+        // ====== //
+
+        let anisotropy;
+        anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+        let model;
+        loader.load(modelSource, gltf => {
+            model = gltf.scene;
+            model.scale.set(modelScale, modelScale, modelScale);
+
+            model.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: child.material.map,
+                    })
+                    if (child.material.map) {
+                        // child.material.map.magFilter = THREE.NearestFilter;
+                        // child.material.map.minFilter = THREE.LinearMipMapLinearFilter;
+                        child.material.map.anisotropy = anisotropy / 2;
+                        child.material.side = THREE.DoubleSide;
+                    }
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
+            scene.add(model);
+        });
+
+        // ====== //
+        // Lights //
+        // ====== //
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 0.5, 100, 1);
+        pointLight.position.set(pointLightPosition.x, pointLightPosition.y, pointLightPosition.z);
+        pointLight.castShadow = false;
+        pointLight.shadow.mapSize.height = 8;
+        pointLight.shadow.mapSize.width = 8;
+
+        const pointLight2 = new THREE.PointLight(0xffffff, 0.5);
+        pointLight2.position.z = 30;
+
+        const lightGroup = new THREE.Group()
+        for (var j = 1; j <= 7; j++) {
+            for (var i = 1; i <= 5; i++) {
+                var pointLightTemp = pointLight2.clone();
+                pointLightTemp.castShadow = false;
+                pointLightTemp.position.z = j * 8 - 30;
+                pointLightTemp.intensity = 0.009;
+                pointLightTemp.position.y += 2;
+                pointLightTemp.position.x = i * 6 - 20;
+                pointLightTemp.shadow.mapSize.height = 512;
+                pointLightTemp.shadow.mapSize.width = 512;
+                lightGroup.add(pointLightTemp);
+            }
+        }
+        lightGroup.rotation.y = -Math.PI / 25;
+        scene.add(lightGroup);
+
+        const pointLight3 = pointLight2.clone();
+        pointLight3.position.z = -30;
+        // scene.add(pointLight2);
+        // scene.add(pointLight3);
+
+        const helper = new THREE.PointLightHelper(pointLight);
+        // scene.add(helper);
+        // scene.add(pointLight);
+
+        // ======== //
+        // Controls //
+        // ======== //
+
+        let control;
+        let target = new THREE.Vector3(0, 0, 0);
+        const controlSpeed = 0.8;
+        const orbitSpeed = 0.4;
+        const scrollSpeed = 0.8;
+
+        function scrollListener(event) {
+            camera.getWorldDirection(direction);
+            if (event.deltaY < 0) {
+                const diffence = Math.abs(camera.position.x - control.target.x)
+                    + Math.abs(camera.position.y - control.target.y)
+                    + Math.abs(camera.position.z - control.target.z);
+                if (diffence < 10) {
+                    control.target.addScaledVector(direction, scrollSpeed);
+                }
+            }
+        }
+
+        let euler = new THREE.Euler(0, 0, 0, 'YXZ');
+        let rotationSpeed = (Math.PI / 180) / 5;
+
+        function onMouseDown(e) {
+            canvas.addEventListener('mousemove', onMouseMove);
+        }
+
+        function onMouseMove(e) {
+            if (lockCamera == false) {
+                const movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+                const movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+
+                euler.y -= movementX * rotationSpeed;
+                euler.x -= movementY * rotationSpeed;
+                euler.x = Math.min(Math.max(euler.x, -1.0472), 1.0472);
+
+                camera.quaternion.setFromEuler(euler);
+            }
+        }
+
+        function enableOrbitControls() {
+            canvas.removeEventListener('mousedown', onMouseDown);
+            canvas.removeEventListener('mouseup', onMouseMove);
+
+            if (control != undefined) {
+                control.dispose();
+            }
+
+            control = new THREE.OrbitControls(camera, canvas);
+            control.zoomSpeed = 0.4;
+            control.zoomSpeed = controlSpeed;
+            control.enableDamping = true;
+            control.enablePan = true;
+            control.target = target;
+
+            canvas.addEventListener('wheel', scrollListener);
+        }
+
+        enableOrbitControls();
+
+        control.enabled = false;
+
+        var lockCamera = true;
+
+        // ==== //
+        // Loop //
+        // ==== //
+
+        const direction = new THREE.Vector3;
+        const clock = new THREE.Clock();
+        const tick = () => {
+            // Render.
+            renderer.render(scene, camera);
+
+            // Call tick again on the next frame.
+            window.requestAnimationFrame(tick);
+
+            // Update control.
+            control.update();
+            if (lockCamera) {
+                camera.lookAt(0, 0, 0);
+            }
+        }
+        tick();
+
+        // ============ //
+        // Resize Event //
+        // ============ //
+
+        function updateSizes() {
+            // Update sizes.
+            sizes = {
+                height: window.innerHeight,
+                width: window.innerWidth,
+            }
+
+            // Update camera.
+            camera.aspect = sizes.width / sizes.height;
+            camera.updateProjectionMatrix();
+
+            // Update renderer.
+            renderer.setSize(sizes.width, sizes.height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        }
+
+        updateSizes();
+
+        window.addEventListener('resize', () => {
+            updateSizes();
+        })
     }
 
     modelViewerOptions.forEach(function (options, index) {
-        console.log(options);
-        prepareThreeJs(options);
+        createScene(options);
     });
 
 });
