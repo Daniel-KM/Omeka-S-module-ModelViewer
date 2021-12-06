@@ -143,12 +143,11 @@ class PrepareModelViewer extends AbstractHelper
             $assetUrl = $view->plugin('assetUrl');
             $view->headLink()
                 ->appendStylesheet($assetUrl('css/model-viewer.css', 'ModelViewer'));
-            // Js modules are not used because they are not enough browser-supported.
+            // Js modules are not used because they are not enough browser-supported
+            // yet and the jsm requires a path that is relative to the main
+            // threejs libray in examples.
             $headScript = $view->headScript()
-                ->appendFile($assetUrl('vendor/threejs/three.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer'])
-                // TODO Add these libraries only when there is an associated mtl file. The same for all associated files. So, use import.
-                ->appendFile($assetUrl('vendor/threejs/js/loaders/DDSLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer'])
-                ->appendFile($assetUrl('vendor/threejs/js/loaders/MTLLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
+                ->appendFile($assetUrl('vendor/threejs/three.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
         }
 
         // Load only assets not yet loaded by a previous model in the page.
@@ -185,6 +184,13 @@ class PrepareModelViewer extends AbstractHelper
                     break;
             }
             $assets[] = $mediaType;
+        }
+
+        if (!empty($options['mtl']) && !in_array('mtl', $assets)) {
+            $headScript
+                ->appendFile($assetUrl('vendor/threejs/js/loaders/DDSLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer'])
+                ->appendFile($assetUrl('vendor/threejs/js/loaders/MTLLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
+            $assets[] = 'mtl';
         }
 
         if (empty($options['config'])) {
