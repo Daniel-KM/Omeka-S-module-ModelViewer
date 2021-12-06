@@ -41,11 +41,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             ? options.config.modelScale
             : 1;
 
-        const pointLightPosition = options.config && options.config.pointLightPosition
-            ? options.config.pointLightPosition
-            : {x: 0, y: 50, z: 15};
-
-        const controls = options.config && options.config.import && options.config.import.controls
+        const controls = options.config && options.config.import && options.config.import.controls && options.config.import.controls.length
             ? options.config.import.controls
             : null;
         var useOrbitControls = true;
@@ -136,9 +132,17 @@ document.addEventListener('DOMContentLoaded', function(event) {
         renderer.setClearColor(0x363636, 1);
         renderer.shadowMap.enabled = true;
 
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        // renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        // renderer.gammaFactor = 2.2;
+        // Do not use.
+        // renderer.physicallyCorrectLights = true;
+
         //====== //
         // Sizes //
         // ===== //
+
+        // TODO Check previous code where there is a computation of the optimal size for the camera.
 
         let sizes = {};
 
@@ -166,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 if (child instanceof THREE.Mesh) {
                     child.material = new THREE.MeshStandardMaterial({
                         map: child.material.map,
-                    })
+                    });
                     if (child.material.map) {
                         // child.material.map.magFilter = THREE.NearestFilter;
                         // child.material.map.minFilter = THREE.LinearMipMapLinearFilter;
@@ -194,43 +198,79 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // Lights //
         // ====== //
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
-        scene.add(ambientLight);
-
-        const pointLight = new THREE.PointLight(0xffffff, 0.5, 100, 1);
-        pointLight.position.set(pointLightPosition.x, pointLightPosition.y, pointLightPosition.z);
-        pointLight.castShadow = false;
-        pointLight.shadow.mapSize.height = 8;
-        pointLight.shadow.mapSize.width = 8;
-
-        const pointLight2 = new THREE.PointLight(0xffffff, 0.5);
-        pointLight2.position.z = 30;
-
-        const lightGroup = new THREE.Group()
-        for (var j = 1; j <= 7; j++) {
-            for (var i = 1; i <= 5; i++) {
-                var pointLightTemp = pointLight2.clone();
-                pointLightTemp.castShadow = false;
-                pointLightTemp.position.z = j * 8 - 30;
-                pointLightTemp.intensity = 0.009;
-                pointLightTemp.position.y += 2;
-                pointLightTemp.position.x = i * 6 - 20;
-                pointLightTemp.shadow.mapSize.height = 512;
-                pointLightTemp.shadow.mapSize.width = 512;
-                lightGroup.add(pointLightTemp);
+        const defaultLights = [
+            {
+                type: 'AmbientLight',
+                color: 0xffffff,
+                intensity: 0.85,
+                position: {x: 0, y: 50, z: 15},
             }
+        ];
+
+        var lights = options.config && options.config.lights && options.config.lights.length
+            ? options.config.lights
+            : defaultLights;
+        if (!(lights instanceof Array)) {
+            lights = [lights];
         }
-        lightGroup.rotation.y = -Math.PI / 25;
-        scene.add(lightGroup);
 
-        const pointLight3 = pointLight2.clone();
-        pointLight3.position.z = -30;
-        // scene.add(pointLight2);
-        // scene.add(pointLight3);
+        lights.forEach((light) => {
+            const color = typeof light.color === 'undefined' ? 0xffffff : light.color;
+            const intensity = typeof light.intensity === 'undefined' ? 1 : light.intensity;
+            const position = typeof light.position === 'undefined' ? {x: 0, y: 0, z: 0} : light.position;
+            if (light.type === 'AmbientLight') {
+                scene.add(new THREE.AmbientLight(color, intensity));
+            } else if (light.type === 'PointLight') {
+                light = new THREE.PointLight(color, intensity);
+                light.position.set(position.x, position.y, position.z);
+                scene.add(light);
+            } else if (light.type === 'DirectionalLight') {
+                light = new THREE.DirectionalLight(color, intensity);
+                light.position.set(position.x, position.y, position.z);
+                scene.add(light);
+            } else if (light.type === 'architecture') {
+                scene.add(new THREE.AmbientLight(0xffffff, 0.85));
 
-        const helper = new THREE.PointLightHelper(pointLight);
-        // scene.add(helper);
-        // scene.add(pointLight);
+                const pointLight2 = new THREE.PointLight(0xffffff, 0.5);
+                pointLight2.position.z = 30;
+
+                const lightGroup = new THREE.Group()
+                for (var j = 1; j <= 7; j++) {
+                    for (var i = 1; i <= 5; i++) {
+                        var pointLightTemp = pointLight2.clone();
+                        pointLightTemp.castShadow = false;
+                        pointLightTemp.position.z = j * 8 - 30;
+                        pointLightTemp.intensity = 0.009;
+                        pointLightTemp.position.y += 2;
+                        pointLightTemp.position.x = i * 6 - 20;
+                        pointLightTemp.shadow.mapSize.height = 512;
+                        pointLightTemp.shadow.mapSize.width = 512;
+                        lightGroup.add(pointLightTemp);
+                    }
+                }
+                lightGroup.rotation.y = -Math.PI / 25;
+                scene.add(lightGroup);
+
+                /*
+                const pointLightPosition = {x: 0, y: 50, z: 15};
+
+                const pointLight = new THREE.PointLight(0xffffff, 0.5, 100, 1);
+                pointLight.position.set(pointLightPosition.x, pointLightPosition.y, pointLightPosition.z);
+                pointLight.castShadow = false;
+                pointLight.shadow.mapSize.height = 8;
+                pointLight.shadow.mapSize.width = 8;
+
+                const pointLight3 = pointLight2.clone();
+                pointLight3.position.z = -30;
+                // scene.add(pointLight2);
+                // scene.add(pointLight3);
+
+                const helper = new THREE.PointLightHelper(pointLight);
+                // scene.add(helper);
+                // scene.add(pointLight);
+                */
+            }
+        });
 
         // ======== //
         // Controls //
