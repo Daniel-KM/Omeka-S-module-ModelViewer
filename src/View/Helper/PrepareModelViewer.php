@@ -122,6 +122,8 @@ class PrepareModelViewer extends AbstractHelper
     protected function initAssets(?MediaRepresentation $media, array $options): void
     {
         static $hasModelViewer = false;
+        static $jsFiles = [];
+
         static $assets = [];
         static $config = [];
         static $property = null;
@@ -148,6 +150,14 @@ class PrepareModelViewer extends AbstractHelper
             // threejs libray in examples.
             $headScript = $view->headScript()
                 ->appendFile($assetUrl('vendor/threejs/three.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
+
+            // Keep all files to load them one time only, when needed.
+            $jsFiles = [];
+            $dir = dirname(__DIR__, 3) . '/asset/vendor/threejs/js';
+            $dirLength = strlen($dir) + 1;
+            foreach ($this->listFiles($dir) as $file) {
+                $jsFiles[substr($file->getPathName(), $dirLength, -3)] = true;
+            }
         }
 
         // Load only assets not yet loaded by a previous model in the page.
@@ -213,22 +223,43 @@ class PrepareModelViewer extends AbstractHelper
                 ->appendFile($assetUrl('vendor/gsap/gsap.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
         }
 
-        switch ($options['config']['controls'] ?? null) {
-            default:
-            case 'OrbitControl':
-                $headScript
-                    ->appendFile($assetUrl('vendor/threejs/js/controls/OrbitControls.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                break;
-            case 'FirstPersonControls':
-                $headScript
-                    ->appendFile($assetUrl('vendor/threejs/js/controls/FirstPersonControls.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                break;
+        // Load orbit + first person by default.
+        if (empty($options['config']['controls'])) {
+            $headScript
+                ->appendFile($assetUrl('vendor/threejs/js/controls/OrbitControls.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer'])
+                ->appendFile($assetUrl('vendor/threejs/js/controls/FirstPersonControls.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
+            $jsFiles['controls/OrbitControls'] = null;
+            $jsFiles['controls/FirstPersonControls'] = null;
+        } else {
+            if (!is_array($options['config']['controls'])) {
+                $options['config']['controls'] = [$options['config']['controls']];
+            }
+            foreach ($options['config']['controls'] as $js) {
+                $jsFile = 'controls/' . $js;
+                if (isset($jsFiles[$jsFile])) {
+                    $headScript
+                        ->appendFile($assetUrl('vendor/threejs/js/' . $jsFile . '.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
+                    $jsFiles[$jsFile] = null;
+                }
+            }
         }
 
+        // Should be loaded last.
+        // TODO Check if it works in all cases (multiple model viewers with various configs).
         if (!$hasModelViewer) {
             $hasModelViewer = true;
             $headScript
                 ->appendFile($assetUrl('js/model-viewer.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
+        }
+    }
+
+    protected function listFiles(string $directory): \Generator
+    {
+        if (is_dir($directory) && is_readable($directory)) {
+            $iterator = new \RecursiveDirectoryIterator($directory);
+            $iterator = new \RecursiveIteratorIterator($iterator);
+            $iterator = new \RegexIterator($iterator, '/\.js$/', \RegexIterator::MATCH);
+            yield from $iterator;
         }
     }
 }
