@@ -197,22 +197,38 @@ are:
 
 ```json
 {
-    "background": "white",
-    "controls": "OrbitControls",
-    "camera": {
-        "position": {
-            "x": 0,
-            "y": 10,
-            "z": 20
-        },
-        "lookAt": {
-            "x": 0,
-            "y": 0,
-            "z": 0
+    "background": "#363636",
+    "scale": 1,
+    "cameras": [
+        {
+            "type": "PerspectiveCamera",
+            "fov": 50,
+            "aspect": 1,
+            "near": 0.1,
+            "far": 2000,
+            "position": {"x": 0, "y": 10, "z": 20},
+            "lookAt": {"x": 0, "y": 0, "z": 0}
         }
+    ],
+    "lights": [
+        {
+            "type": "AmbientLight",
+            "color": 16777215,
+            "intensity": 0.85,
+            "position": {"x": 0, "y": 50, "z": 15}
+        }
+    ],
+    "speed": {
+        "control": 0.8,
+        "orbit": 0.4,
+        "scroll": 0.8
     }
 }
 ```
+
+To add threejs specific files, you can add the key `import` + js asset type (the
+directory set in asset/vendor/threejs/js) as a subkey + the name of the classes
+(the filename without `.js`).
 
 ### Examples
 
