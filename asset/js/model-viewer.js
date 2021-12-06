@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         return;
     }
 
-    // console.log(modelViewerOptions);
+    console.log(modelViewerOptions);
 
     function createScene(options) {
 
@@ -44,8 +44,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
         const pointLightPosition = options.config && options.config.pointLightPosition
             ? options.config.pointLightPosition
             : {x: 0, y: 50, z: 15};
-        // Use orbit by default.
-        var useOrbitControl = !!options.useOrbitControl;
+
+        const controls = options.config && options.config.import && options.config.import.controls
+            ? options.config.import.controls
+            : null;
+        var useOrbitControls = true;
 
         // Don't load animation two times with FirstPersonControls.
         var animationDuration = 0;
@@ -89,31 +92,36 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // ======= //
 
         function toggleMode() {
-            if (useOrbitControl) {
+            if (useOrbitControls) {
                 enableFirstPersonControls();
             } else {
                 enableOrbitControls();
             }
-            useOrbitControl = !useOrbitControl;
+            useOrbitControls = !useOrbitControls;
         }
 
         let button = document.createElement('div');
         button.className = 'model-button button-fullscreen';
         viewerElement.appendChild(button);
 
-        button = document.createElement('div');
-        button.className = 'model-button button-mode1';
-        viewerElement.appendChild(button);
+        // The switcher is used only when no specific control is set.
+        var buttonMode1;
+        var buttonMode2;
+        if (!controls) {
+            button = document.createElement('div');
+            button.className = 'model-button button-mode1';
+            viewerElement.appendChild(button);
 
-        button = document.createElement('div');
-        button.className = 'model-button button-mode2';
-        viewerElement.appendChild(button);
+            button = document.createElement('div');
+            button.className = 'model-button button-mode2';
+            viewerElement.appendChild(button);
 
-        const buttonMode1 = document.getElementsByClassName('button-mode1').item(0);
-        const buttonMode2 = document.getElementsByClassName('button-mode2').item(0);
+            buttonMode1 = document.getElementsByClassName('button-mode1').item(0);
+            buttonMode2 = document.getElementsByClassName('button-mode2').item(0);
 
-        buttonMode1.addEventListener('click', toggleMode);
-        buttonMode2.addEventListener('click', toggleMode);
+            buttonMode1.addEventListener('click', toggleMode);
+            buttonMode2.addEventListener('click', toggleMode);
+        }
 
         // ======== //
         // Renderer //
@@ -267,11 +275,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
 
         function enableOrbitControls() {
-            if (buttonMode1) {
+            if (!controls) {
                 buttonMode1.style.opacity = 1;
                 buttonMode1.style.pointerEvents = 'all';
-            }
-            if (buttonMode2) {
                 buttonMode2.style.opacity = 0;
                 buttonMode2.style.pointerEvents = 'none';
             }
@@ -294,11 +300,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
 
         function enableFirstPersonControls() {
-            if (buttonMode1) {
+            if (!controls) {
                 buttonMode1.style.opacity = 0;
                 buttonMode1.style.pointerEvents = 'none';
-            }
-            if (buttonMode2) {
                 buttonMode2.style.opacity = 1;
                 buttonMode2.style.pointerEvents = 'all';
             }
@@ -350,11 +354,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
             })
         }
 
-        // TODO Use orbit by default.
-        if (useOrbitControl) {
-            enableOrbitControls();
-        } else {
+        if (controls === 'FirstPersonControls') {
             enableFirstPersonControls();
+        } else {
+            enableOrbitControls();
         }
 
         if (control != undefined) {
@@ -405,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             window.requestAnimationFrame(tick);
 
             // Update control.
-            if (useOrbitControl) {
+            if (useOrbitControls) {
                 control.update();
             } else {
                 // control.update(clock.getDelta() * 20);

@@ -12,8 +12,7 @@ class PrepareModelViewer extends AbstractHelper
     * @var array
     */
     protected $defaultConfig = [
-        // Control is Orbit by default.
-        // Use page background color (or "white" or "lightgray" or #181818 or anything else).
+        // Use page background color (or "white" or "lightgray" or #181818 of #363636 or anything else).
         'background' => 'white',
         'camera' => [
             'position' => ['x' => 0, 'y' => 10, 'z' => 20],
@@ -144,18 +143,28 @@ class PrepareModelViewer extends AbstractHelper
             if ($mediaConfig) {
                 $mediaConfig = json_decode($mediaConfig->value(), true);
                 if (is_array($mediaConfig)) {
-                    $config = array_replace($config, $mediaConfig);
+                    foreach ($mediaConfig as $key => $element) {
+                        $config[$key] = isset($config[$key]) && is_array($config[$key])
+                            ? array_merge($config[$key], $element)
+                            : $element;
+                    }
                 } else {
                     $view->logger()->warn(sprintf('[Model viewer]: Specific config for media %d is not a valid json.', $media->id())); // @translate
                 }
             }
         }
 
-        $options['config'] = array_replace($config, $options['config'] ?? []);
+        if (empty($options['config'])) {
+            $options['config'] = $config;
+        } else {
+            foreach ($mediaConfig as $key => $element) {
+                $options['config'][$key] = isset($options['config'][$key]) && is_array($options['config'][$key])
+                    ? array_merge($options['config'][$key], $element)
+                    : $element;
+            }
+        }
 
         $this->initAssets($media, $options);
-
-        unset($options['config']['import']);
 
         return $options;
     }
@@ -273,8 +282,6 @@ class PrepareModelViewer extends AbstractHelper
             $jsFiles['gsap'] = null;
         }
 
-        // A control is required.
-        $hasControls = true;
         $jsModuleKeys = [
             'animation',
             'cameras',
@@ -305,9 +312,6 @@ class PrepareModelViewer extends AbstractHelper
         ];
         foreach ($jsModuleKeys as $jsModuleKey) {
             if (empty($options['config']['import'][$jsModuleKey])) {
-                if ($jsModuleKey === 'controls') {
-                    $hasControls = false;
-                }
                 continue;
             }
             if (!is_array($options['config']['import'][$jsModuleKey])) {
@@ -323,7 +327,8 @@ class PrepareModelViewer extends AbstractHelper
             }
         }
 
-        if (!$hasControls) {
+        // A control is required.
+        if (empty($options['config']['import']['controls']) && isset($jsFiles['controls/OrbitControls'])) {
             $headScript
                 ->appendFile($assetUrl('vendor/threejs/js/controls/OrbitControls.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
             $jsFiles['controls/OrbitControls'] = null;
