@@ -8,18 +8,6 @@ use Omeka\Api\Representation\MediaRepresentation;
 
 class PrepareModelViewer extends AbstractHelper
 {
-   /**
-    * @var array
-    */
-    protected $defaultConfig = [
-        // Use page background color (or "white" or "lightgray" or #181818 of #363636 or anything else).
-        'background' => 'white',
-        'cameras' => [[
-            'position' => ['x' => 0, 'y' => 10, 'z' => 20],
-            'lookAt' => ['x' => 0, 'y' => 0, 'z' => 0],
-        ]],
-    ];
-
     /**
      * Get all options for the model viewer (threejs) and init css/js.
      *
@@ -51,7 +39,7 @@ class PrepareModelViewer extends AbstractHelper
             } else {
                 $mainConfig = [];
             }
-            $commonConfig = array_replace($this->defaultConfig, $mainConfig);
+            $commonConfig = $mainConfig;
             $property = $setting('modelviewer_config_property');
         }
 

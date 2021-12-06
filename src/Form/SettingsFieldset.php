@@ -30,7 +30,7 @@ class SettingsFieldset extends Fieldset
                 'type' => Textarea::class,
                 'options' => [
                     'label' => 'Default scene config (json)', // @translate
-                    'infos' => 'This config is used only when the model doesn’t have data for it. The json is not checked, so check commas and double quotes or use https://jsonformatter.org.', // translate
+                    'infos' => 'This config is used to set default params and each key may be overridden by the model. The json is not checked, so verify commas and double quotes or use https://jsonformatter.org.', // translate
                     'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer#default-config',
                 ],
                 'attributes' => [
