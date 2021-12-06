@@ -44,6 +44,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
         const pointLightPosition = options.config && options.config.pointLightPosition
             ? options.config.pointLightPosition
             : {x: 0, y: 50, z: 15};
+        // Use orbit by default.
+        var useOrbitControl = !!options.useOrbitControl;
+
+        // Don't load animation two times with FirstPersonControls.
+        var animationDuration = 0;
 
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(background);
@@ -83,9 +88,32 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // Buttons //
         // ======= //
 
+        function toggleMode() {
+            if (useOrbitControl) {
+                enableFirstPersonControls();
+            } else {
+                enableOrbitControls();
+            }
+            useOrbitControl = !useOrbitControl;
+        }
+
         let button = document.createElement('div');
         button.className = 'model-button button-fullscreen';
         viewerElement.appendChild(button);
+
+        button = document.createElement('div');
+        button.className = 'model-button button-mode1';
+        viewerElement.appendChild(button);
+
+        button = document.createElement('div');
+        button.className = 'model-button button-mode2';
+        viewerElement.appendChild(button);
+
+        const buttonMode1 = document.getElementsByClassName('button-mode1').item(0);
+        const buttonMode2 = document.getElementsByClassName('button-mode2').item(0);
+
+        buttonMode1.addEventListener('click', toggleMode);
+        buttonMode2.addEventListener('click', toggleMode);
 
         // ======== //
         // Renderer //
@@ -143,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             });
 
             setTimeout(() => {
+                animateCamera();
                 progressLoader.style.opacity = 0;
                 setTimeout(() => {
                      progressLoader.style.display = 'none';
@@ -238,6 +267,15 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
 
         function enableOrbitControls() {
+            if (buttonMode1) {
+                buttonMode1.style.opacity = 1;
+                buttonMode1.style.pointerEvents = 'all';
+            }
+            if (buttonMode2) {
+                buttonMode2.style.opacity = 0;
+                buttonMode2.style.pointerEvents = 'none';
+            }
+
             canvas.removeEventListener('mousedown', onMouseDown);
             canvas.removeEventListener('mouseup', onMouseMove);
 
@@ -255,11 +293,103 @@ document.addEventListener('DOMContentLoaded', function(event) {
             canvas.addEventListener('wheel', scrollListener);
         }
 
-        enableOrbitControls();
+        function enableFirstPersonControls() {
+            if (buttonMode1) {
+                buttonMode1.style.opacity = 0;
+                buttonMode1.style.pointerEvents = 'none';
+            }
+            if (buttonMode2) {
+                buttonMode2.style.opacity = 1;
+                buttonMode2.style.pointerEvents = 'all';
+            }
 
-        control.enabled = false;
+            animateCamera();
+            canvas.removeEventListener('wheel', scrollListener);
 
+            if (control != undefined) {
+                control.dispose();
+            }
+
+            // control = new PointerLockControls(camera, canvas);
+            if (control != undefined) {
+                control.enablePan = true;
+            }
+
+            canvas.addEventListener('wheel', event => {
+                camera.getWorldDirection(direction);
+                if (event.deltaY < 0) {
+                    camera.position.addScaledVector(direction, controlSpeed);
+                } else {
+                    const antiDirection = new THREE.Vector3(-direction.x, -direction.y, -direction.z);
+                    camera.position.addScaledVector(antiDirection, controlSpeed);
+                }
+            })
+
+            // canvas.addEventListener('mousedown', () => {
+            //     canvas.requestPointerLock();
+            //     setTimeout(function () {
+            //         document.exitPointerLock();
+            //         setTimeout(function () {
+            //             canvas.requestPointerLock();
+            //         }, 20);
+            //     }, 20);
+            // });
+            // canvas.addEventListener('mouseup', () => {
+            //     if (control.unlock) {
+            //         control.unlock();
+            //     }
+            // });
+
+            canvas.addEventListener('mousedown', onMouseDown);;
+            canvas.addEventListener('mouseup', function () {
+                canvas.removeEventListener('mousemove', onMouseMove);
+            });
+
+            canvas.addEventListener('contextmenu', event => {
+                event.preventDefault();
+            })
+        }
+
+        // TODO Use orbit by default.
+        if (useOrbitControl) {
+            enableOrbitControls();
+        } else {
+            enableFirstPersonControls();
+        }
+
+        if (control != undefined) {
+            control.enabled = false;
+        }
+
+        animationDuration = 2;
         var lockCamera = true;
+
+        function animateCamera() {
+            // Don't animate two times on load with firstPersonControls.
+            if (!animationDuration || typeof gsap === 'undefined') {
+                lockCamera = false;
+                return;
+            }
+
+            lockCamera = true;
+            gsap.to(camera.position, { x: 0, duration: animationDuration });
+            gsap.to(camera.position, { y: 0, duration: animationDuration });
+            gsap.to(camera.position, { z: 30, duration: animationDuration / 2 });
+            gsap.to(camera.quaternion, { x: 0, duration: animationDuration });
+            gsap.to(camera.quaternion, { y: 0, duration: animationDuration });
+            gsap.to(camera.quaternion, { z: 0, duration: animationDuration });
+
+            if (control != undefined) {
+                control.target.set(0, 0, 0);
+            }
+            camera.lookAt(0, 0, 0);
+            setTimeout(() => {
+                lockCamera = false;
+                if (control != undefined) {
+                    control.enabled = true;
+                }
+            }, animationDuration * 1000);
+        }
 
         // ==== //
         // Loop //
@@ -275,7 +405,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
             window.requestAnimationFrame(tick);
 
             // Update control.
-            control.update();
+            if (useOrbitControl) {
+                control.update();
+            } else {
+                // control.update(clock.getDelta() * 20);
+            }
             if (lockCamera) {
                 camera.lookAt(0, 0, 0);
             }
