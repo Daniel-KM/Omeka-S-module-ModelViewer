@@ -276,7 +276,7 @@ class PrepareModelViewer extends AbstractHelper
             }
         }
 
-        if (!empty($options['config']['import']['gsap']) && !array_key_exists('gsap', $jsFiles)) {
+        if (!empty($options['config']['animation']) && !array_key_exists('gsap', $jsFiles)) {
             $headScript
                 ->appendFile($assetUrl('vendor/gsap/gsap.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
             $jsFiles['gsap'] = null;

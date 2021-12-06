@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
         const background = options.config && options.config.background && options.config.background.length
             ? options.config.background : 'white';
 
-        const modelScale = options.config && options.config.modelScale
-            ? options.config.modelScale
+        const modelScale = options.config && options.config.scale
+            ? options.config.scale
             : 1;
 
         const controls = options.config && options.config.import && options.config.import.controls && options.config.import.controls.length
@@ -575,12 +575,15 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
 
         animationDuration = 2;
-        var lockCamera = true;
+        var lockCamera = !!options.config.animation;
 
         function animateCamera() {
             // Don't animate two times on load with firstPersonControls.
-            if (!animationDuration || typeof gsap === 'undefined') {
+            if (!options.config.animation || !animationDuration || typeof gsap === 'undefined') {
                 lockCamera = false;
+                if (control != undefined) {
+                    control.enabled = true;
+                }
                 return;
             }
 
