@@ -448,9 +448,17 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
         let control;
         let target = new THREE.Vector3(0, 0, 0);
-        const controlSpeed = 0.8;
-        const orbitSpeed = 0.4;
-        const scrollSpeed = 0.8;
+
+        // TODO Normalize to manage multiple controls params.
+        const controlSpeed = options.config && options.config.speed && options.config.speed.control
+            ? options.config.speed.control
+            : 1;
+        const orbitSpeed = options.config && options.config.control && options.config.speed.orbit
+            ? options.config.speed.orbit
+            : 1;
+        const scrollSpeed = options.config && options.config.control && options.config.speed.scroll
+            ? options.config.speed.scroll
+            : 1;
 
         function scrollListener(event) {
             camera.getWorldDirection(direction);
