@@ -22,10 +22,14 @@ modelViewerOptions.push($optionsJson);
 JS;
 $this->headScript()
     ->appendScript($script);
+
+// User attribute names and values are already escaped.
+$attrs = '';
+foreach ($options['attributes'] as $name => $value) $attrs .= ' ' . $name . '="' . $value . '"';
 ?>
 
 <?php if (!empty($options['heading'])): ?>
     <h2><?= $options['heading'] ?></h2>
 <?php endif; ?>
 
-<div id="<?= $options['id'] ?>" <?= $options['attributes'] ?? 'class="threejs" allowfullscreen="allowfullscreen" style="height: 600px; height: 70vh;"' ?>><canvas></canvas></div>
+<div id="<?= $options['id'] ?>"<?= $attrs ?>><canvas></canvas></div>
