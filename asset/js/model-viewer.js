@@ -55,6 +55,30 @@ document.addEventListener('DOMContentLoaded', function(event) {
         const manager = new THREE.LoadingManager();
         const loader = new THREE.GLTFLoader(manager);
 
+        const progressLoader = document.createElement('div');
+        {
+            progressLoader.className = 'loader';
+            let progressMessage = document.createElement('p');
+            progressMessage.appendChild(document.createTextNode('Loading'));
+            progressLoader.appendChild(progressMessage);
+
+            let progress = document.createElement('div');
+            progress.id = 'progress';
+            progress.className = 'progress';
+
+            var progressBar = document.createElement('div');
+            progressBar.id = 'progress-bar';
+            progressBar.className = 'progress-bar';
+
+            progress.appendChild(progressBar);
+            progressLoader.appendChild(progress);
+            viewerElement.appendChild(progressLoader);
+
+            manager.onProgress = function (item, loaded, total) {
+                progressBar.style.width = (loaded / total * 100) + '%';
+            }
+        }
+
         // ======== //
         // Renderer //
         // ======== //
@@ -109,6 +133,14 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     child.receiveShadow = true;
                 }
             });
+
+            setTimeout(() => {
+                progressLoader.style.opacity = 0;
+                setTimeout(() => {
+                     progressLoader.style.display = 'none';
+                     viewerElement.removeChild(progressLoader);
+                }, 200);
+            }, 1000);
 
             scene.add(model);
         });
