@@ -71,12 +71,13 @@ class Model implements RendererInterface
             $options['attributes'] = $this->defaultOptions['attributes'];
         }
 
+        unset($options['template']);
+
         $vars = [
             'resource' => $media,
             'options' => $options,
         ];
 
-        unset($options['template']);
         $partial = $plugins->get('partial');
         return $template !== self::PARTIAL_NAME && $view->resolver($template)
             ? $partial($template, $vars)
