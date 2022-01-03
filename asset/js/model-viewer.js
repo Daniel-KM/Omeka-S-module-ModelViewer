@@ -93,6 +93,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     }
                     viewerElement.getElementsByTagName('ul')[0].innerHTML += '<li>' + url + "</li>\n";
                 };
+            manager
+                .onLoad = function() {
+                    updateSizes();
+                };
         }
 
         // ======= //
@@ -141,15 +145,18 @@ document.addEventListener('DOMContentLoaded', function(event) {
             antialias: true,
             alpha: true,
         });
-        renderer.setClearColor(0x363636, 1);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        // renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setClearColor(scene.background, 1);
         renderer.shadowMap.enabled = true;
 
         renderer.outputEncoding = THREE.sRGBEncoding;
+        // renderer.toneMappingExposure = 1.0;
         // renderer.toneMapping = THREE.ACESFilmicToneMapping;
         // renderer.gammaFactor = 2.2;
         // Do not use.
         // renderer.physicallyCorrectLights = true;
-
 
         //====== //
         // Sizes //
@@ -157,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
         // TODO Check previous code where there is a computation of the optimal size (frameArea) for the camera (globally and each object).
 
-        let sizes = {};
+        var sizes = {};
 
         // ======= //
         // Cameras //
@@ -182,13 +189,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
 
         cameras.forEach((camera, index) => {
-            const near = typeof camera.near === 'undefined' ? 0.1 : camera.near;
-            const far = typeof camera.far === 'undefined' ? 2000 : camera.far;
-            const position = typeof camera.position === 'undefined' ? {x: 50, y: 50, z: 80} : camera.position;
-            const lookAt = typeof camera.lookAt === 'undefined' ? {x: 0, y: 0, z: 0} : camera.lookAt;
+            const near = typeof camera.near === 'undefined' ? defaultCameras[0].near : camera.near;
+            const far = typeof camera.far === 'undefined' ? defaultCameras[0].far : camera.far;
+            const position = typeof camera.position === 'undefined' ? defaultCameras[0].position : camera.position;
+            const lookAt = typeof camera.lookAt === 'undefined' ? defaultCameras[0].lookAt : camera.lookAt;
             if (camera.type === 'PerspectiveCamera') {
-                const fov = typeof camera.fov === 'undefined' ? 50 : camera.fov;
-                const aspect = typeof camera.aspect === 'undefined' ? 1 : camera.aspect;
+                const fov = typeof camera.fov === 'undefined' ? defaultCameras[0].fov : camera.fov;
+                const aspect = typeof camera.aspect === 'undefined' ? defaultCameras[0].aspect : camera.aspect;
                 camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
                 camera.position.set(position.x, position.y, position.z);
                 camera.lookAt(lookAt.x, lookAt.y, lookAt.z);
@@ -215,6 +222,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
             camera.lookAt(0, 0, 0);
             scene.add(camera);
         }
+
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
 
         // ====== //
         // Meshes //
@@ -508,7 +518,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
             }
 
             control = new THREE.OrbitControls(camera, canvas);
-            control.zoomSpeed = 0.4;
             control.zoomSpeed = controlSpeed;
             control.enableDamping = true;
             control.enablePan = true;
@@ -652,21 +661,22 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // ============ //
 
         function updateSizes() {
-            // Update sizes.
-            sizes = {
-                height: window.innerHeight,
-                width: window.innerWidth,
+            // Update size.
+            var size = {
+                height: canvas.clientHeight,
+                width: canvas.clientWidth,
             }
 
             // Update camera.
-            camera.aspect = sizes.width / sizes.height;
+            camera.aspect = size.width / size.height;
             camera.updateProjectionMatrix();
 
             // Update renderer.
-            renderer.setSize(sizes.width, sizes.height);
+            renderer.setSize(size.width, size.height);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         }
 
+        // Update size after init.
         updateSizes();
 
         window.addEventListener('resize', () => {
