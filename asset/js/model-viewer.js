@@ -41,6 +41,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
             ? options.config.scale
             : 1;
 
+        // const hasMatCap = options.config && options.config.import && options.config.import.loaders && options.config.import.loaders
+        //     ? options.config.import.loaders.includes('EXRLoader')
+        //     : false;
+        const matcapTextureFile = options.config && options.config.matcap_texture
+            ? options.config.matcap_texture
+            : null;
+
         const controls = options.config && options.config.import && options.config.import.controls && options.config.import.controls.length
             ? options.config.import.controls
             : null;
@@ -226,6 +233,19 @@ document.addEventListener('DOMContentLoaded', function(event) {
         camera.aspect = canvas.clientWidth / canvas.clientHeight;
         camera.updateProjectionMatrix();
 
+        // ================= //
+        // Material / MatCap //
+        // ================= //
+
+        // const loaderEXR = matcapTextureFile
+        //     ? new THREE.EXRLoader(manager).setDataType(THREE.UnsignedByteType)
+        //     : null;
+        // const matcap = loaderEXR.load(matcapTextureFile)
+
+        const matcap = matcapTextureFile
+            ? new THREE.TextureLoader(manager).load(matcapTextureFile)
+            : null;
+
         // ====== //
         // Meshes //
         // ====== //
@@ -250,9 +270,17 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
                         model.traverse((child) => {
                             if (child instanceof THREE.Mesh) {
-                                child.material = new THREE.MeshStandardMaterial({
-                                    map: child.material.map,
-                                });
+                                if (matcap) {
+                                    child.material = new THREE.MeshMatcapMaterial({
+                                        map: child.material.map,
+                                        matcap: matcap,
+                                        color: new THREE.Color().setHex(0xffffff).convertSRGBToLinear(),
+                                    });
+                                } else {
+                                    child.material = new THREE.MeshStandardMaterial({
+                                        map: child.material.map,
+                                    });
+                                }
                                 if (child.material.map) {
                                     // child.material.map.magFilter = THREE.NearestFilter;
                                     // child.material.map.minFilter = THREE.LinearMipMapLinearFilter;
@@ -268,9 +296,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
                             animateCamera();
                             progressLoader.style.opacity = 0;
                             setTimeout(() => {
-                                 progressLoader.style.display = 'none';
-                                 if (viewerElement.getElementsByClassName('loader').length) {
-                                     viewerElement.removeChild(progressLoader);
+                                progressLoader.style.display = 'none';
+                                if (viewerElement.getElementsByClassName('loader').length) {
+                                    viewerElement.removeChild(progressLoader);
                                 }
                             }, 200);
                         }, 1000);
@@ -283,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 .addHandler(/\.dds$/i, new DDSLoader());
             if (options.mtl && options.mtl.length) {
                 new THREE.MTLLoader(manager)
-                    .load( options.mtl[0], function (materials) {
+                    .load(options.mtl[0], function (materials) {
                         materials.preload();
                         new THREE.OBJLoader(manager)
                             .setMaterials(materials)
@@ -293,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                                     scene.add(object);
                                 }
                             );
-                    } );
+                    });
             } else {
                 new THREE.OBJLoader(manager)
                     .load(
@@ -342,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     const mixer = new THREE.AnimationMixer(object);
                     const action = mixer.clipAction(object.animations[0]);
                     action.play();
-                    object.traverse( function (child) {
+                    object.traverse(function (child) {
                         if (child.isMesh) {
                             child.castShadow = true;
                             child.receiveShadow = true;
