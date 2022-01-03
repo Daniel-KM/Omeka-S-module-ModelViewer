@@ -51,18 +51,35 @@
                     "reference": "3.8.0"
                 }
             }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "nidorx/matcaps",
+                "version": "1.0",
+                "type": "omeka-addon-asset-images",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://github.com/nidorx/matcaps/releases/download/v1.0/64.zip",
+                    "reference": "v1.0"
+                }
+            }
         }
     ],
     "require": {
         "oomphinc/composer-installers-extender": "^2.0",
         "mrdoob/threejs": "132",
-        "greensock/gsap": "3.8.0"
+        "greensock/gsap": "3.8.0",
+        "nidorx/matcaps": "1.0.0"
     },
     "extra": {
-        "installer-types": ["omeka-addon-asset"],
+        "installer-types": ["omeka-addon-asset", "omeka-addon-asset-images"],
         "installer-paths": {
             "asset/vendor/{$name}/": [
                 "type:omeka-addon-asset"
+            ],
+            "asset/img/{$name}/": [
+                "type:omeka-addon-asset-images"
             ]
         }
     }

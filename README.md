@@ -206,7 +206,7 @@ are:
             "aspect": 1,
             "near": 0.1,
             "far": 2000,
-            "position": {"x": 0, "y": 10, "z": 20},
+            "position": {"x": 50, "y": 50, "z": 80},
             "lookAt": {"x": 0, "y": 0, "z": 0}
         }
     ],
@@ -229,6 +229,17 @@ are:
 To add threejs specific files, you can add the key `import` + js asset type (the
 directory set in asset/vendor/threejs/js) as a subkey + the name of the classes
 (the filename without `.js`).
+
+It's possible to add a texture with key "matcap_texture" and a url to an image,
+or an image from the directory `asset/img/matcaps`, copied from the [Nidorx MatCap]
+repository. In that case, set the full path, prepending "/modules/ModelViewer/"),
+for example:
+
+```
+    "matcap_texture": "/modules/ModelViewer/asset/img/matcaps/EAEAEA_B6B6B6_CCCCCC_C4C4C4-64px.png"
+```
+
+TO use a matcap texture speeds the display, because lights are skipped.
 
 ### Examples
 
@@ -329,6 +340,8 @@ See online issues on the [module issues] page on GitLab.
 License
 -------
 
+### Module
+
 This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
@@ -348,7 +361,14 @@ and, more generally, to use and operate it in the same conditions of security.
 This Agreement may be freely reproduced and published, provided it is not
 altered, and that no provisions are either added or removed herefrom.
 
+### Library
+
 The [Three JS] library is published under the [MIT licence].
+
+### Assets
+
+Matcap images are free assets from the [Nidorx MatCap] repository.
+Check individual licence on it.
 
 
 Copyright
@@ -386,4 +406,5 @@ Module Model Viewer for Omeka S:
 [OSI]: http://opensource.org
 [MIT licence]: https://github.com/UniversalViewer/universalviewer/blob/master/LICENSE.txt
 [threejs.org]: https://threejs.org
+[Nidorx MatCap]: https://github.com/nidorx/matcaps
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
