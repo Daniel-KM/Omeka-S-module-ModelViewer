@@ -4,6 +4,8 @@ Model viewer (module for Omeka S)
 [Model viewer] is a module for [Omeka S] that integrates [three.js], a viewer
 for 3D models.
 
+A live example can be found on [PSL digital library].
+
 
 Installation
 ------------
@@ -380,12 +382,13 @@ Widget [Three JS]:
 
 Module Model Viewer for Omeka S:
 
-* Copyright Daniel Berthereau, 2021 (see [Daniel-KM])
+* Copyright Daniel Berthereau, 2021-2022 (see [Daniel-KM])
 
 
 [Model viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer
 [Omeka S]: https://omeka.org/s
-[three.js]: https://threejs.org/
+[three.js]: https://threejs.org
+[PSL digital library]: https://bibnum.explore.psl.eu/s/psl/ark:/18469/3t76z
 [ModelViewer.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/releases
 [threejs]: https://threejs.org
 [Three JS]: https://threejs.org
