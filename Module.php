@@ -77,21 +77,10 @@ class Module extends AbstractModule
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         $sharedEventManager->attach(
-            'Omeka\Controller\Site\Item',
-            'view.show.after',
-            [$this, 'handleViewShowAfterItem']
-        );
-        $sharedEventManager->attach(
             \Omeka\Form\SettingForm::class,
             'form.add_elements',
             [$this, 'handleMainSettings']
         );
-    }
-
-    public function handleViewShowAfterItem(Event $event): void
-    {
-        $view = $event->getTarget();
-        echo $view->threeJs($view->item);
     }
 
     protected function updateWhitelist(): void
