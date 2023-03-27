@@ -385,7 +385,7 @@ Widget [Three JS]:
 
 Module Model Viewer for Omeka S:
 
-* Copyright Daniel Berthereau, 2021-2022 (see [Daniel-KM])
+* Copyright Daniel Berthereau, 2021-2023 (see [Daniel-KM])
 
 
 [Model viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer
