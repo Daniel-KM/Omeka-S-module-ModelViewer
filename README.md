@@ -367,6 +367,9 @@ altered, and that no provisions are either added or removed herefrom.
 
 The [Three JS] library is published under the [MIT licence].
 
+The library [gsap] is included to simplify animations. The source is open and
+the library is free, but the license is proprietary.
+
 ### Assets
 
 Matcap images are free assets from the [Nidorx MatCap] repository.
@@ -409,5 +412,6 @@ Module Model Viewer for Omeka S:
 [OSI]: http://opensource.org
 [MIT licence]: https://github.com/UniversalViewer/universalviewer/blob/master/LICENSE.txt
 [threejs.org]: https://threejs.org
+[gsap]: https://greensock.com/gsap
 [Nidorx MatCap]: https://github.com/nidorx/matcaps
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
