@@ -36,10 +36,8 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
-use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Omeka\Module\Exception\ModuleCannotInstallException;
-use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
 class Module extends AbstractModule
@@ -61,7 +59,7 @@ class Module extends AbstractModule
                 . $t->translate('See module’s installation documentation.')); // @translate
         }
 
-        $messenger = new Messenger();
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
         $message = new Message(
             'If your json and xml files are not recognized as model, install modules Bulk Edit and/or Xml Viewer.' // @translate
                 . ' ' . $t->translate('See module’s installation documentation.') // @translate
