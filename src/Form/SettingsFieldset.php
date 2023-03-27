@@ -13,6 +13,7 @@ class SettingsFieldset extends Fieldset
     public function init(): void
     {
         $this
+            ->setAttribute('id', 'model-viewer')
             ->add([
                 'name' => 'modelviewer_config_property',
                 'type' => PropertySelect::class,
