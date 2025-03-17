@@ -55,6 +55,18 @@ class SettingsFieldset extends Fieldset
                     'rows' => 10,
                 ],
             ])
+
+            ->add([
+                'name' => 'modelviewer_js_full',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'player',
+                    'label' => 'Model Viewer: Load all ThreeJS addons', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'modelviewer_js_full',
+                ],
+            ])
         ;
     }
 }

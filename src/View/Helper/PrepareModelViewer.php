@@ -169,9 +169,13 @@ class PrepareModelViewer extends AbstractHelper
         if (!$hasModelViewer) {
             $view = $this->getView();
             $plugins = $view->getHelperPluginManager();
+            $setting = $plugins->get('setting');
             $assetUrl = $plugins->get('assetUrl');
             $headLink = $plugins->get('headLink');
             $headScript = $plugins->get('headScript');
+
+            $fullJs = !empty($setting('modelviewer_js_full'));
+
             $headLink
                 ->appendStylesheet($assetUrl('css/model-viewer.css', 'ModelViewer'));
 
@@ -191,7 +195,7 @@ class PrepareModelViewer extends AbstractHelper
                 ->appendFile($assetUrl('vendor/gsap/gsap.min.js', 'ModelViewer'), 'text/javascript')
                 // Should be loaded last (asynchronous anyway).
                 // TODO Check if it works in all cases (multiple model viewers with various configs).
-                ->appendFile($assetUrl('js/model-viewer.js', 'ModelViewer'), 'module');
+                ->appendFile($assetUrl($fullJs ? 'js/model-viewer-full.js' : 'js/model-viewer.js', 'ModelViewer'), 'module');
 
             $hasModelViewer = true;
         }

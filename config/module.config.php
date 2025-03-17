@@ -85,6 +85,7 @@ return [
                     }
                 }
                 JSON,
+            'modelviewer_js_full' => false,
         ],
     ],
 ];
