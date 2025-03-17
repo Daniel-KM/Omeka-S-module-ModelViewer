@@ -20,6 +20,7 @@
         "viewer",
         "3D viewer",
         "model viewer",
+        "threejs",
         "gltf",
         "glb",
         "dae",
@@ -30,12 +31,12 @@
             "type": "package",
             "package": {
                 "name": "mrdoob/threejs",
-                "version": "150",
+                "version": "174",
                 "type": "omeka-addon-asset",
                 "dist": {
                     "type": "tar",
-                    "url": "https://github.com/Daniel-KM/Omeka-S-module-ModelViewer/releases/download/3.4.1-150/threejs.tar.gz",
-                    "reference": "3.4.1-150"
+                    "url": "https://github.com/Daniel-KM/Omeka-S-module-ModelViewer/releases/download/3.4.2-174/threejs-174.tar.gz",
+                    "reference": "3.4.2-174"
                 }
             }
         },
@@ -43,12 +44,12 @@
             "type": "package",
             "package": {
                 "name": "greensock/gsap",
-                "version": "3.11.5",
+                "version": "3.12.7",
                 "type": "omeka-addon-asset",
                 "dist": {
                     "type": "file",
                     "url": "https://raw.githubusercontent.com/greensock/GSAP/master/dist/gsap.min.js",
-                    "reference": "3.11.5"
+                    "reference": "3.12.7"
                 }
             }
         },
@@ -68,8 +69,8 @@
     ],
     "require": {
         "oomphinc/composer-installers-extender": "^2.0",
-        "mrdoob/threejs": "150",
-        "greensock/gsap": "3.11.5",
+        "mrdoob/threejs": "174",
+        "greensock/gsap": "3.12.7",
         "nidorx/matcaps": "1.0.0"
     },
     "extra": {

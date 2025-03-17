@@ -1,5 +1,28 @@
 "use strict";
 
+import * as THREE from '../vendor/threejs/three.module.min.js';
+
+// To load all libraries with namespace Addons.
+// import * as Addons from '../vendor/threejs/jsm/Addons.js';
+
+import WebGL from '../vendor/threejs/jsm/capabilities/WebGL.js';
+
+import { OrbitControls } from '../vendor/threejs/jsm/controls/OrbitControls.js';
+
+// Loader are small files.
+import { GLTFLoader } from '../vendor/threejs/jsm/loaders/GLTFLoader.js';
+import { ColladaLoader } from '../vendor/threejs/jsm/loaders/ColladaLoader.js';
+import { DDSLoader } from '../vendor/threejs/jsm/loaders/DDSLoader.js';
+import { EXRLoader } from '../vendor/threejs/jsm/loaders/EXRLoader.js';
+import { FBXLoader } from '../vendor/threejs/jsm/loaders/FBXLoader.js';
+import { MTLLoader } from '../vendor/threejs/jsm/loaders/MTLLoader.js';
+import { OBJLoader } from '../vendor/threejs/jsm/loaders/OBJLoader.js';
+import { VRMLLoader } from '../vendor/threejs/jsm/loaders/VRMLLoader.js';
+
+// Some libraries are needed for some loaders (threejs, fbx).
+import chevrotain from "../vendor/threejs/jsm/libs/chevrotain.module.min.js";
+import * as fflate from "../vendor/threejs/jsm/libs/fflate.module.js";
+
 // Currently, the config is defined inside the html via js variable "modelViewerOptions".
 
 document.addEventListener('DOMContentLoaded', function(event) {
@@ -238,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         // ================= //
 
         // const loaderEXR = matcapTextureFile
-        //     ? new THREE.EXRLoader(manager).setDataType(THREE.UnsignedByteType)
+        //     ? new EXRLoader(manager).setDataType(THREE.UnsignedByteType)
         //     : null;
         // const matcap = loaderEXR.load(matcapTextureFile)
 
@@ -260,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             || options.mediaType === 'model/gltf+json'
             || options.mediaType === 'model/gltf'
         ) {
-            const loader = new THREE.GLTFLoader(manager);
+            const loader = new GLTFLoader(manager);
             loader
                 .load(
                     modelSource,
@@ -310,10 +333,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
             manager
                 .addHandler(/\.dds$/i, new DDSLoader());
             if (options.mtl && options.mtl.length) {
-                new THREE.MTLLoader(manager)
+                new MTLLoader(manager)
                     .load(options.mtl[0], function (materials) {
                         materials.preload();
-                        new THREE.OBJLoader(manager)
+                        new OBJLoader(manager)
                             .setMaterials(materials)
                             .load(
                                 options.source,
@@ -323,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                             );
                     });
             } else {
-                new THREE.OBJLoader(manager)
+                new OBJLoader(manager)
                     .load(
                         options.source,
                         function (object) {
@@ -338,12 +361,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     scene.add(colladaScene);
                 };
             if (options.mtl && options.mtl.length) {
-                new THREE.MTLLoader(manager)
+                new MTLLoader(manager)
                     .load(
                         options.mtl[0],
                         function (materials) {
                             materials.preload();
-                            new THREE.ColladaLoader(manager)
+                            new ColladaLoader(manager)
                                 .load(
                                     options.source,
                                     function (collada) {
@@ -353,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                         }
                     );
             } else {
-                const loader = new THREE.ColladaLoader(manager);
+                const loader = new ColladaLoader(manager);
                 loader
                     .load(
                         options.source,
@@ -363,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     );
             }
         } else if (options.mediaType === 'model/vnd.filmbox') {
-            const loader = new THREE.FBXLoader();
+            const loader = new FBXLoader();
             loader.load(
                 options.source,
                 function (object) {
@@ -380,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 }
             );
         } else if (options.mediaType === 'application/vnd.threejs+json') {
-            const loader = new THREE.VRMLoader();
+            const loader = new VRMLoader();
             loader
                 .load(
                     options.source,
@@ -545,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 control.dispose();
             }
 
-            control = new THREE.OrbitControls(camera, canvas);
+            control = new OrbitControls(camera, canvas);
             control.zoomSpeed = controlSpeed;
             control.enableDamping = true;
             control.enablePan = true;

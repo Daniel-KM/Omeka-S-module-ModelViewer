@@ -3,6 +3,8 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
  * @var array $options
+ *
+ * @see https://discoverthreejs.com/book/introduction/get-threejs/
  */
 
 // Can be used directly with an item or through media file rendering, so some checks are added.
@@ -14,14 +16,14 @@ if (is_null($options)) {
 }
 
 $optionsJson = json_encode($options, 448);
-$script = <<<JS
+$optionsJs = <<<JS
 if (typeof modelViewerOptions === 'undefined') {
     var modelViewerOptions = [];
 }
 modelViewerOptions.push($optionsJson);
 JS;
 $this->headScript()
-    ->appendScript($script);
+    ->appendScript($optionsJs);
 
 // User attribute names and values are already escaped.
 $attrs = '';

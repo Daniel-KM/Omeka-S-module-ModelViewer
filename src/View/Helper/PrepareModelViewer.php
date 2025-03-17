@@ -163,171 +163,37 @@ class PrepareModelViewer extends AbstractHelper
     protected function initAssets(?MediaRepresentation $media, array $options): void
     {
         static $hasModelViewer = false;
-        static $jsFiles = [];
-        static $assetUrl;
-        static $headScript;
-
-        $view = $this->getView();
-
-        $mediaType = $options['mediaType'];
-
-        if (!$hasModelViewer) {
-            $assetUrl = $view->plugin('assetUrl');
-            $view->headLink()
-                ->appendStylesheet($assetUrl('css/model-viewer.css', 'ModelViewer'));
-            // Js modules are not used because they are not enough browser-supported
-            // yet and the jsm requires a path that is relative to the main
-            // threejs libray in examples.
-            $headScript = $view->headScript()
-                ->appendFile($assetUrl('vendor/threejs/three.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-
-            // Keep all files to load them one time only, when needed.
-            $jsFiles = [];
-            $dir = dirname(__DIR__, 3) . '/asset/vendor/threejs/js';
-            $dirLength = strlen($dir) + 1;
-            foreach ($this->listFiles($dir) as $file) {
-                $jsFiles[substr($file->getPathName(), $dirLength, -3)] = true;
-            }
-        }
 
         // Load only assets not yet loaded by a previous model in the page.
 
-        // Load common loaders even when they are not set in config.
-        switch ($mediaType) {
-            case 'model/gltf-binary':
-            case 'model/gltf+json':
-            case 'model/gltf':
-                if (isset($jsFiles['loaders/GLTFLoader'])) {
-                    $headScript
-                        ->appendFile($assetUrl('vendor/threejs/js/loaders/GLTFLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                    $jsFiles['loaders/GLTFLoader'] = null;
-                }
-                break;
-            case 'model/obj':
-                if (isset($jsFiles['loaders/OBJLoader'])) {
-                    $headScript
-                         ->appendFile($assetUrl('vendor/threejs/js/loaders/OBJLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                     $jsFiles['loaders/OBJLoader'] = null;
-                }
-                break;
-            case 'model/vnd.collada+xml':
-                if (isset($jsFiles['loaders/ColladaLoader'])) {
-                    $headScript
-                        ->appendFile($assetUrl('vendor/threejs/js/loaders/ColladaLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                    $jsFiles['loaders/ColladaLoader'] = null;
-                }
-                break;
-            case 'model/vnd.filmbox':
-                if (isset($jsFiles['libs/fflate.min'])) {
-                    $headScript
-                        ->appendFile($assetUrl('vendor/threejs/js/libs/fflate.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                    $jsFiles['libs/fflate.min'] = null;
-                }
-                if (isset($jsFiles['loaders/FBXLoader'])) {
-                    $headScript
-                        ->appendFile($assetUrl('vendor/threejs/js/loaders/FBXLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                    $jsFiles['loaders/FBXLoader'] = null;
-                }
-                break;
-            case 'application/vnd.threejs+json':
-                // Vrml loader require Gltf loader.
-                if (isset($jsFiles['libs/chevrotain.min'])) {
-                    $headScript
-                        ->appendFile($assetUrl('vendor/threejs/js/libs/chevrotain.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                    $jsFiles['libs/chevrotain.min'] = null;
-                }
-                if (isset($jsFiles['loaders/GLTFLoader'])) {
-                    $headScript
-                        ->appendFile($assetUrl('vendor/threejs/js/loaders/GLTFLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                    $jsFiles['loaders/GLTFLoader'] = null;
-                }
-                if (isset($jsFiles['loaders/VRMLoader'])) {
-                    $headScript
-                        ->appendFile($assetUrl('vendor/threejs/js/loaders/VRMLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                    $jsFiles['loaders/VRMLoader'] = null;
-                }
-                break;
-            default:
-                break;
-        }
-        // Issue without mime-type for mtl.
-        if (!empty($options['mtl'])) {
-            if (isset($jsFiles['loaders/DDSLoader'])) {
-                $headScript
-                    ->appendFile($assetUrl('vendor/threejs/js/loaders/DDSLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                $jsFiles['loaders/DDSLoader'] = null;
-            }
-            if (isset($jsFiles['loaders/MTLLoader'])) {
-                $headScript
-                    ->appendFile($assetUrl('vendor/threejs/js/loaders/MTLLoader.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                $jsFiles['loaders/MTLLoader'] = null;
-            }
-        }
-
-        if (!empty($options['config']['animation']) && !array_key_exists('gsap', $jsFiles)) {
-            $headScript
-                ->appendFile($assetUrl('vendor/gsap/gsap.min.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-            $jsFiles['gsap'] = null;
-        }
-
-        $jsModuleKeys = [
-            'animation',
-            'cameras',
-            'controls',
-            'csm',
-            'curves',
-            'deprecated',
-            'effects',
-            'environments',
-            'exporters',
-            'geometries',
-            'helpers',
-            'interactive',
-            'libs',
-            'lights',
-            'lines',
-            'loaders',
-            'math',
-            'misc',
-            'modifiers',
-            'objects',
-            'physics',
-            'postprocessing',
-            'renderers',
-            'shaders',
-            'textures',
-            'utils',
-        ];
-        foreach ($jsModuleKeys as $jsModuleKey) {
-            if (empty($options['config']['import'][$jsModuleKey])) {
-                continue;
-            }
-            if (!is_array($options['config']['import'][$jsModuleKey])) {
-                $options['config']['import'][$jsModuleKey] = [$options['config']['import'][$jsModuleKey]];
-            }
-            foreach ($options['config']['import'][$jsModuleKey] as $jsModule) {
-                $jsFile = "$jsModuleKey/$jsModule";
-                if (isset($jsFiles[$jsFile])) {
-                    $headScript
-                        ->appendFile($assetUrl('vendor/threejs/js/' . $jsFile . '.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-                    $jsFiles[$jsFile] = null;
-                }
-            }
-        }
-
-        // A control is required.
-        if (empty($options['config']['import']['controls']) && isset($jsFiles['controls/OrbitControls'])) {
-            $headScript
-                ->appendFile($assetUrl('vendor/threejs/js/controls/OrbitControls.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
-            $jsFiles['controls/OrbitControls'] = null;
-        }
-
-        // Should be loaded last (asynchronous anyway).
-        // TODO Check if it works in all cases (multiple model viewers with various configs).
         if (!$hasModelViewer) {
-            $hasModelViewer = true;
+            $view = $this->getView();
+            $plugins = $view->getHelperPluginManager();
+            $assetUrl = $plugins->get('assetUrl');
+            $headLink = $plugins->get('headLink');
+            $headScript = $plugins->get('headScript');
+            $headLink
+                ->appendStylesheet($assetUrl('css/model-viewer.css', 'ModelViewer'));
+
+            // Js modules and importmap are used now because they are enough
+            // browser-supported.
+            /** @see https://developer.mozilla.org/fr/docs/Web/HTML/Element/script/type/importmap */
+            $three = $assetUrl('vendor/threejs', 'ModelViewer', false, false, false);
+            $importMap = <<<JSON
+                {
+                    "imports": {
+                        "three": "$three/three.module.min.js"
+                   }
+                }
+                JSON;
             $headScript
-                ->appendFile($assetUrl('js/model-viewer.js', 'ModelViewer'), 'text/javascript', ['defer' => 'defer']);
+                ->appendScript($importMap, 'importmap', ['noescape' => true])
+                ->appendFile($assetUrl('vendor/gsap/gsap.min.js', 'ModelViewer'), 'text/javascript')
+                // Should be loaded last (asynchronous anyway).
+                // TODO Check if it works in all cases (multiple model viewers with various configs).
+                ->appendFile($assetUrl('js/model-viewer.js', 'ModelViewer'), 'module');
+
+            $hasModelViewer = true;
         }
     }
 
