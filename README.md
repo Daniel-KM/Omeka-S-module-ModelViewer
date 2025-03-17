@@ -10,15 +10,18 @@ A live example can be found on [PSL digital library].
 Installation
 ------------
 
+See general end user documentation for [installing a module].
+
+The module [Common] must be installed first.
+
 The module uses an external library [three.js], so use the release zip to
-install it, or use and init the source. Furthermore, it is recommended to
-install the modules [Bulk Edit] when your files are `gltf`, and [Xml Viewer]
-when your files are Collada `dae` (see below).
+install it, or use and init the source.
 
 * From the zip
 
-Download the last release [ModelViewer.zip] from the list of releases (the master
-does not contain the dependency), and uncompress it in the `modules` directory.
+Download the last release [ModelViewer.zip] from the list of releases (the
+master does not contain the dependency), and uncompress it in the `modules`
+directory.
 
 * From the source and for development:
 
@@ -29,7 +32,31 @@ the module to `ModelViewer`, and go to the root module, and run:
 composer install --no-dev
 ```
 
-Then install it like any other Omeka module.
+Then install it like any other Omeka module and follow the config instructions.
+
+* About threejs
+
+To prepare the tar.gz for threejs: clone the repository and run:
+
+```sh
+npm install
+npx vite build
+```
+
+Then move files as in directory asset/vendor/threejs (move build/* to root and
+directories inside examples/ to root. Remove some useless files and tar the
+directory.
+
+
+File types
+----------
+
+Some servers do not identify 3D files correctly. For example, a `gltf` is a json
+file, but it should not have the media type `application/json` but `model/gltf+json`.
+So you should edit the media types of the files. The same issue occurs with
+`glb`, or Collada `dae` (see below) and many other model files.
+
+You may use [Bulk Edit] to batch edit the right media type in that case.
 
 
 Usage
@@ -53,9 +80,10 @@ tools.
 
 The glTF format has two variants: a single binary file (`.glb`) or a main json
 file (`.gltf`) and related files (images, textures, etc.). The first one is
-simpler to manage because the model is a single file. The second can be updated
-easily, at least outside of Omeka, but is harder to manage and requires absolute
-urls or module [Archive Repertory] (see below).
+simpler to manage because the model is a single file, but it can be an heavy
+one (as a video file anyway). The second can be updated easily, at least outside
+of Omeka, but is harder to manage and requires absolute urls or module [Archive Repertory]
+(see below).
 
 The internal format of threejs is supported too, but only if it is internally
 based on glTF v2, so it is not recommended.
@@ -89,12 +117,12 @@ them in the admin settings:
 
 Media-types:
 ```
-application/octet-stream, application/vnd.threejs+json, model/gltf-binary, model/gltf+json, model/obj, model/vnd.collada+xml, model/vnd.filmbox, image/ktx2, model/mtl
+application/octet-stream, application/vnd.threejs+json, model/gltf-binary, model/gltf+json, model/obj, model/vnd.collada+xml, model/vnd.filmbox, image/ktx2, model/mtl, text/x-c
 ```
 
 Extensions:
 ```
-bin, dae, fbx, glb, gltf, json, ktx2, mtl, obj
+bin, dae, fbx, glb, gltf, glsl, json, ktx2, mtl, obj, xml
 ```
 
 In some cases, if you use single file, the `.glb` files or the related `.bin`
@@ -111,10 +139,10 @@ Because Collada files are xml files, they are not automatically recognized by
 Omeka.
 
 To identify them, there are two solutions: use the file extension `.dae` or
-install the module [Xml Viewer], that identify the xml-dae files with the vendor
-media type `model/vnd.collada+xml`.
+install the module [Bulk Edit] (see below), that should identify the xml-dae
+files with the vendor media type `model/vnd.collada+xml`.
 
-### Identification of files (json...)
+### Identification of files (json…)
 
 In other case, you may need to update directly the media-type of each file. You
 can use the module [Bulk Edit] that adds this feature in the batch edit in item/browse
@@ -143,7 +171,7 @@ The module [Archive Repertory] must be installed when the json files that
 represent the 3D models use files that are identified by a basename and not a
 full url. This is generally the case, because the model contains external
 images for textures and binary files for data. Like Omeka hashes filenames when
-it ingests files, the files can’t be retrieved by the Universal Viewer.
+it ingests files, the files can’t be retrieved by the viewer.
 
 This module is not required when there is no external images or when these
 images are referenced in the json files with a full url.
@@ -199,7 +227,7 @@ are:
 
 ```json
 {
-    "background": "#363636",
+    "background": "#d6d6d6",
     "scale": 1,
     "cameras": [
         {
@@ -238,7 +266,7 @@ repository. In that case, set the full path, prepending "/modules/ModelViewer/")
 for example:
 
 ```
-    "matcap_texture": "/modules/ModelViewer/asset/img/matcaps/EAEAEA_B6B6B6_CCCCCC_C4C4C4-64px.png"
+"matcap_texture": "/modules/ModelViewer/asset/img/matcaps/EAEAEA_B6B6B6_CCCCCC_C4C4C4-64px.png"
 ```
 
 TO use a matcap texture speeds the display, because lights are skipped.
@@ -252,13 +280,15 @@ and textures, or a main file that references many other files. Of course, it is
 simpler to manage only one file, but it may be not a possible choice in all
 cases.
 
-Only glTF version 2.0 is supported, so v1.0 models should be converted (this is
-lossless).
+Only glTF version 2.0 is supported, so v1.0 models should be converted. Many
+tools can do it and the process is lossless.
 
 ##### Single binary file (glb)
 
 With a single file, no special configuration is needed: just load it as a
-standard media or url, for example "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/AntiqueCamera/glTF-Binary/AntiqueCamera.glb".
+standard media or url, for example "https://github.com/KhronosGroup/glTF-Sample-Assets/raw/refs/heads/main/Models/AntiqueCamera/glTF-Binary/AntiqueCamera.glb".
+
+If nothing is displayed, check the media type of the file, that should be `model/gltf-binary`.
 
 ##### Multiple files (gltf)
 
@@ -269,9 +299,10 @@ the shaders and textures.
 - Create a new item with the following metadata:
   - Title: Flight Helmet
   - License: Public domain
-  - Add this file as thumbnail of the item: https://github.com/KhronosGroup/glTF-Sample-Models/blob/master/2.0/FlightHelmet/screenshot/screenshot.jpg
-- Add all the files in the directory https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/FlightHelmet/glTF,
-  starting with the file "FlightHelmet.bin".
+  - Add this file as thumbnail (not media) of the item: https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/FlightHelmet/screenshot/screenshot.jpg
+- Add all the files in the directory https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/FlightHelmet/glTF,
+  starting with the file "FlightHelmet.gltf" or "FlightHelmet.bin".
+- Check that the media type for the file gltf is `model/gltf+json`.
 - Go to the public page of the item and watch it!
 
 Of course, it is simpler to use a spreadsheet with modules [Bulk Import] or [CSV Import].
@@ -385,13 +416,14 @@ Widget [Three JS]:
 
 Module Model Viewer for Omeka S:
 
-* Copyright Daniel Berthereau, 2021-2023 (see [Daniel-KM])
+* Copyright Daniel Berthereau, 2021-2025 (see [Daniel-KM])
 
 
 [Model viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer
 [Omeka S]: https://omeka.org/s
 [three.js]: https://threejs.org
 [PSL digital library]: https://bibnum.explore.psl.eu/s/psl/ark:/18469/3t76z
+[Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [ModelViewer.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/releases
 [threejs]: https://threejs.org
 [Three JS]: https://threejs.org
