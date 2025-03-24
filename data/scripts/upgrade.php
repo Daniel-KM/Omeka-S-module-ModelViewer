@@ -37,6 +37,7 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
     );
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }
+
 if (version_compare($oldVersion, '3.4.2', '<')) {
     $this->updateWhitelist();
 
