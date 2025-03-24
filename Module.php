@@ -56,7 +56,7 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $t = $services->get('MvcTranslator');
 
-        $js = __DIR__ . '/asset/vendor/threejs/three.min.js';
+        $js = __DIR__ . '/asset/vendor/threejs/three.module.min.js';
         if (!file_exists($js)) {
             throw new ModuleCannotInstallException(
                 sprintf(
