@@ -1,6 +1,10 @@
 Model viewer (module for Omeka S)
 =================================
 
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
+
 [Model viewer] is a module for [Omeka S] that integrates [three.js], a viewer
 for 3D models.
 
@@ -446,4 +450,5 @@ Module Model Viewer for Omeka S:
 [threejs.org]: https://threejs.org
 [gsap]: https://greensock.com/gsap
 [Nidorx MatCap]: https://github.com/nidorx/matcaps
+[GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
