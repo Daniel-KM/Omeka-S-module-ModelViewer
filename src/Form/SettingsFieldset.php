@@ -21,7 +21,7 @@ class SettingsFieldset extends Fieldset
     public function init(): void
     {
         $this
-            ->setAttribute('id', 'form-model-viewer')
+            ->setAttribute('id', 'model-viewer-form')
             ->setOption('element_groups', $this->elementGroups)
 
             ->add([
