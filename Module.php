@@ -33,6 +33,7 @@ if (!class_exists(\Common\TraitModule::class)) {
     require_once dirname(__DIR__) . '/Common/TraitModule.php';
 }
 
+use Common\Stdlib\PsrMessage;
 use Common\TraitModule;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\View\Renderer\PhpRenderer;
@@ -55,22 +56,29 @@ class Module extends AbstractModule
     protected function preInstall(): void
     {
         $services = $this->getServiceLocator();
-        $t = $services->get('MvcTranslator');
+        $translate = $services->get('ControllerPluginManager')->get('translate');
+
+        if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.80')) {
+            $message = new \Omeka\Stdlib\Message(
+                $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+                'Common', '3.4.80'
+            );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
 
         $js = __DIR__ . '/asset/vendor/threejs/three.module.min.js';
         if (!file_exists($js)) {
             throw new ModuleCannotInstallException(
                 sprintf(
-                    $t->translate('The library "%s" should be installed.'), // @translate
+                    $translate('The library "%s" should be installed. See module’s installation documentation.'), // @translate
                     'Three Js'
-                ) . ' '
-                . $t->translate('See module’s installation documentation.')); // @translate
+                )
+            );
         }
 
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
         $message = new Message(
-            'If your json and xml files are not recognized as model, install modules Bulk Edit and/or Xml Viewer.' // @translate
-                . ' ' . $t->translate('See module’s installation documentation.') // @translate
+            'If your json and xml files are not recognized as model, install modules EasyAdmin or Bulk Edit. See module’s installation documentation.' // @translate
         );
         $messenger->addWarning($message);
     }
