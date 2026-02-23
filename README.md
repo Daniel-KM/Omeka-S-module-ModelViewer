@@ -43,24 +43,16 @@ Then install it like any other Omeka module and follow the config instructions.
 To prepare the tar.gz for threejs: clone the repository and run:
 
 ```sh
+cd /tmp
+git clone --depth 1 --branch r183 https://github.com/mrdoob/three.js.git
+cd three.js
 npm install
-npx vite build
+npm run build
 ```
 
 Then move files as in directory asset/vendor/threejs (move build/* to root and
 directories inside examples/ to root. Remove some useless files and tar the
 directory.
-
-
-File types
-----------
-
-Some servers do not identify 3D files correctly. For example, a `gltf` is a json
-file, but it should not have the media type `application/json` but `model/gltf+json`.
-So you should edit the media types of the files. The same issue occurs with
-`glb`, or Collada `dae` (see below) and many other model files.
-
-You may use [Bulk Edit] to batch edit the right media type in that case.
 
 
 Usage
@@ -111,13 +103,41 @@ Object (`.obj`), but they were less checked.
 
 ### Cors
 
-To share the files with other servers, the server may need to allow CORS.
+To share the 3D models across domains, the server needs to send CORS headers
+("Cross-Origin Resource Sharing"). In particular, when models are loaded in a
+page on a different domain, the browser requires the server to allow the request.
+
+Because the 3D model files are served as static files by Apache (not through
+PHP), the CORS headers must be configured at the server level. The Apache module
+`mod_headers` must be enabled:
+
+```sh
+sudo a2enmod headers
+sudo systemctl restart apache2
+```
+
+Then add the following directive in the Apache virtual host configuration or in
+the file `.htaccess` at the root of Omeka S:
+
+```htaccess
+<IfModule mod_headers.c>
+    Header setIfEmpty Access-Control-Allow-Origin "*"
+</IfModule>
+```
+
+The directive `setIfEmpty` avoids duplicating the header if it is already set
+elsewhere. The `IfModule` block ensures that the directive is ignored if
+`mod_headers` is not available.
+
+The module detects the current CORS state at install time and on the config page
+and displays a warning if the headers are missing or an error if they are set
+multiple times (which disables them).
 
 ### Media-types and security issue
 
 By default, the 3D models are not allowed in the default global settings. The
-module adds them during install, but if they are removed, you have to re-add
-them in the admin settings:
+module adds them during install and check them on each upgrade, but if they are
+removed, you have to re-add them in the admin settings:
 
 Media-types:
 ```
@@ -137,32 +157,32 @@ Don't forget to reenable it after upload, because it is a security issue, or add
 other security checks somewhere else, in particular during authentication or
 with a server virus scanner (generally the [clam av] on Linux server).
 
-### Identification of xml Collada files
+### Media types
 
-Because Collada files are xml files, they are not automatically recognized by
-Omeka.
+The media type should be set correctly for each file. Since version 3.4.4, the
+identification works fine in most of the cases via [Common] now, but some issues
+may occur on some formats.
 
-To identify them, there are two solutions: use the file extension `.dae` or
-install the module [Bulk Edit] (see below), that should identify the xml-dae
-files with the vendor media type `model/vnd.collada+xml`.
+Indeed, some servers do not identify 3D files correctly. For example, a `gltf`
+is a json file, but it should not have the media type `application/json` but
+`model/gltf+json`.
 
-### Identification of files (json…)
+So you should check the media types of the files. The same issue occurs with
+`glb`, or Collada `dae` and many other model files.
 
-In other case, you may need to update directly the media-type of each file. You
-can use the module [Bulk Edit] that adds this feature in the batch edit in item/browse
-and media/browse.
-
-It is important in particular to convert the `application/json` into `model/gltf+json`.
+You may use [Easy Admin] or [Bulk Edit] to batch edit the right media type in
+that case.
 
 ### Size warning
 
 It is important to warn visitors about the size of the 3D models: not everyone
-has the fiber. Unlike big images that can be tiled statically or dynamically, no
-3D model streaming format is supported for now and 3D models should be fully
-loaded to be displayed, in particular when they are served as one binary file.
+has the fiber or 5G. Unlike big images that can be tiled statically or
+dynamically, no 3D model streaming format is supported for now and 3D models
+should be fully loaded to be displayed, in particular when they are served as
+one binary file.
 
-The examples below are 46 MB (Flying Helmet, [17 files], glTF) and 16 MB (The Kiss,
-3 files, ThreeJs).
+The examples below are 46 MB (Flying Helmet, [17 files], glTF) and 16 MB
+(The Kiss, 3 files, ThreeJs).
 
 ### Possible requirement
 
@@ -219,6 +239,36 @@ and the original filename should be "thumb", "thumbnail", "screenshot",
 or "webp". This name allows to make the distinction between the thumbnail and
 the textures that belong to the item.
 
+### Viewer modes
+
+The viewer has two interaction modes, toggled by the buttons in the bottom right
+corner:
+
+- Eye mode (default): left-click and drag to orbit the object around its center.
+  Scroll to zoom in/out.
+- Globe mode: left-click and drag to look around (the camera stays in place and
+  the view direction rotates, like turning your head). Scroll to move
+  forward/backward. Useful for exploring the inside of architectural 3D models.
+
+On load, the object auto-rotates slowly. The auto-rotation stops on the first
+user interaction.
+
+### Lighting
+
+Since version 3.4.4-183, the viewer uses image-based lighting (IBL) via the
+Three.js `RoomEnvironment`, which produces natural, uniform lighting from all
+directions. The original PBR materials embedded in glTF models (roughness,
+metalness, normal maps) are preserved, giving accurate colors similar to
+original.
+
+The previous flat `AmbientLight` configuration has been removed from the default
+settings. If you had a custom lighting config, you can update it in the main
+settings to benefit from the new IBL lighting (simply remove the `lights` key
+from the JSON).
+
+Extra lights can still be added via the `lights` key in the config for specific
+use cases (e.g. `architecture` light preset for indoor scenes).
+
 ### Specific config
 
 When a model doesn't contain all the required data to build a scene, in
@@ -244,14 +294,6 @@ are:
             "lookAt": {"x": 0, "y": 0, "z": 0}
         }
     ],
-    "lights": [
-        {
-            "type": "AmbientLight",
-            "color": 16777215,
-            "intensity": 0.85,
-            "position": {"x": 0, "y": 50, "z": 15}
-        }
-    ],
     "speed": {
         "control": 0.8,
         "orbit": 0.4,
@@ -260,20 +302,26 @@ are:
 }
 ```
 
+The `lights` key is optional. When omitted, the viewer uses IBL (environment
+lighting) for natural rendering. When provided, the extra lights are added on
+top of the environment. Available light types: `AmbientLight`, `PointLight`,
+`DirectionalLight`, `HemisphereLight`, and `architecture` (preset for indoor
+architectural models).
+
 To add threejs specific files, you can add the key `import` + js asset type (the
 directory set in asset/vendor/threejs/js) as a subkey + the name of the classes
 (the filename without `.js`).
 
 It's possible to add a texture with key "matcap_texture" and a url to an image,
-or an image from the directory `asset/img/matcaps`, copied from the [Nidorx MatCap]
+or an image from the directory `asset/vendor/matcaps`, copied from the [Nidorx MatCap]
 repository. In that case, set the full path, prepending "/modules/ModelViewer/"),
 for example:
 
 ```
-"matcap_texture": "/modules/ModelViewer/asset/img/matcaps/EAEAEA_B6B6B6_CCCCCC_C4C4C4-64px.png"
+"matcap_texture": "/modules/ModelViewer/asset/vendor/matcaps/EAEAEA_B6B6B6_CCCCCC_C4C4C4-64px.png"
 ```
 
-TO use a matcap texture speeds the display, because lights are skipped.
+To use a matcap texture speeds the display, because lights are skipped.
 
 ### Examples
 
@@ -355,7 +403,8 @@ TODO
 ----
 
 - [ ] Manage all 3D formats (in iiif [see example] or https://iiif-3d-manifests.netlify.app and in the viewer (https://github.com/edsilv/virtex/tree/master/src)).
-- [ ] Store the json precise type (model/gltf+json) in media during import or via a job (see module ExtractOcr for xml).
+- [x] Store the json precise type (model/gltf+json) in media during import or via a job (done via Common).
+- [ ] Manage undetectable format: Three.js JSON (`application/vnd.threejs+json`), OBJ (`model/obj`) and MTL (`model/mtl`).
 - [ ] Manage subdirectories with module Archive Repertory.
 
 
@@ -432,13 +481,14 @@ Module Model Viewer for Omeka S:
 [threejs]: https://threejs.org
 [Three JS]: https://threejs.org
 [clam av]: https://www.clamav.net
-[Xml Viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-XmlViewer
+[Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
 [Bulk Edit]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkEdit
 [17 files]: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/FlightHelmet
 [glTF]: https://en.wikipedia.org/wiki/GlTF
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
+[Universal Viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-UniversalViewer
 [JsonFormatter]: https://jsonformatter.org
 [see example]: https://www.morphosource.org/manifests/1fbaa268-b02f-4b46-a249-cef46bcbe04c
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/issues
