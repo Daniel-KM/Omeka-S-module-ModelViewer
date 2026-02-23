@@ -35,6 +35,7 @@ if (!class_exists(\Common\TraitModule::class)) {
 
 use Common\TraitModule;
 use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Stdlib\Message;
 use Omeka\Module\AbstractModule;
@@ -78,6 +79,19 @@ class Module extends AbstractModule
     {
         $this->postInstallAuto();
         $this->updateWhitelist();
+        $this->messageCors();
+    }
+
+    protected function postUpgrade(?string $oldVersion, ?string $newVersion): void
+    {
+        $this->postUpgradeAuto($oldVersion, $newVersion);
+        $this->messageCors();
+    }
+
+    public function getConfigForm(PhpRenderer $renderer)
+    {
+        $this->messageCors();
+        return $this->getConfigFormAuto($renderer);
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
@@ -104,5 +118,50 @@ class Module extends AbstractModule
         $whitelist = array_unique(array_merge(array_values($whitelist), array_values($extensions)));
         sort($whitelist);
         $settings->set('extension_whitelist', $whitelist);
+    }
+
+    /**
+     * Check how many times the CORS header is returned (zero or one).
+     *
+     * Returning "Access-Control-Allow-Origin" multiple times disables it.
+     *
+     * @see \IiifServer\Module::checkCorsHeaders()
+     */
+    protected function checkCorsHeaders(): int
+    {
+        $services = $this->getServiceLocator();
+        $assetUrl = $services->get('ViewHelperManager')->get('assetUrl');
+        $checkServerUrl = $assetUrl('css/style.css', 'Omeka', false, true, true);
+
+        $headers = @get_headers($checkServerUrl, true);
+        if (!$headers) {
+            return 0;
+        }
+
+        return array_key_exists('Access-Control-Allow-Origin', $headers)
+            ? count((array) $headers['Access-Control-Allow-Origin'])
+            : 0;
+    }
+
+    /**
+     * @see \IiifServer\Module::messageCors()
+     */
+    protected function messageCors(): void
+    {
+        $messenger = $this->getServiceLocator()
+            ->get('ControllerPluginManager')->get('messenger');
+
+        $corsHeaders = $this->checkCorsHeaders();
+        if (!$corsHeaders) {
+            $message = new PsrMessage(
+                'The CORS headers are not set. You should enable Apache module "mod_headers" and add the header "Access-Control-Allow-Origin" to allow other sites to access your 3D models. See readme.' // @translate
+            );
+            $messenger->addWarning($message);
+        } elseif ($corsHeaders > 1) {
+            $message = new PsrMessage(
+                'The CORS header "Access-Control-Allow-Origin" is set multiple times in the config of Apache or in the file .htaccess. Duplicating the header disables it. Check your server configuration.' // @translate
+            );
+            $messenger->addError($message);
+        }
     }
 }
