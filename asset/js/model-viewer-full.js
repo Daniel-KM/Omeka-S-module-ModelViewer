@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         renderer.setClearColor(scene.background, 1);
         renderer.shadowMap.enabled = true;
 
-        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
         // renderer.toneMappingExposure = 1.0;
         // renderer.toneMapping = THREE.ACESFilmicToneMapping;
         // renderer.gammaFactor = 2.2;
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                                     child.material = new THREE.MeshMatcapMaterial({
                                         map: child.material.map,
                                         matcap: matcap,
-                                        color: new THREE.Color().setHex(0xffffff).convertSRGBToLinear(),
+                                        color: new THREE.Color(0xffffff),
                                     });
                                 } else {
                                     child.material = new THREE.MeshStandardMaterial({
@@ -366,11 +366,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     );
             }
         } else if (options.mediaType === 'model/vnd.filmbox') {
-            const loader = new THREEAddons.FBXLoader();
+            const loader = new Addons.FBXLoader();
             loader.load(
                 options.source,
                 function (object) {
-                    const mixer = new Addons.AnimationMixer(object);
+                    const mixer = new THREE.AnimationMixer(object);
                     const action = mixer.clipAction(object.animations[0]);
                     action.play();
                     object.traverse(function (child) {

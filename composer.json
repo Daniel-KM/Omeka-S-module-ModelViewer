@@ -52,7 +52,7 @@
     "extra": {
         "installer-name": "ModelViewer",
         "external-assets": {
-            "asset/vendor/threejs/": "https://github.com/Daniel-KM/Omeka-S-module-ModelViewer/releases/download/3.4.2-174/threejs-174.tar.gz",
+            "asset/vendor/threejs/": "https://github.com/Daniel-KM/Omeka-S-module-ModelViewer/releases/download/3.4.4-183/threejs-183.tar.gz",
             "asset/vendor/gsap/gsap.min.js": "https://raw.githubusercontent.com/greensock/GSAP/master/dist/gsap.min.js",
             "asset/vendor/matcaps/": "https://github.com/nidorx/matcaps/releases/download/v1.0/64.zip"
         }

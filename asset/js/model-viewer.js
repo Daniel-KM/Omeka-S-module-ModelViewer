@@ -5,7 +5,7 @@ import * as THREE from '../vendor/threejs/three.module.min.js';
 // To load all libraries with namespace Addons.
 // import * as Addons from '../vendor/threejs/jsm/Addons.js';
 
-import WebGL from '../vendor/threejs/jsm/capabilities/WebGL.js';
+// import WebGL from '../vendor/threejs/jsm/capabilities/WebGL.js';
 
 import { OrbitControls } from '../vendor/threejs/jsm/controls/OrbitControls.js';
 
@@ -20,8 +20,8 @@ import { OBJLoader } from '../vendor/threejs/jsm/loaders/OBJLoader.js';
 import { VRMLLoader } from '../vendor/threejs/jsm/loaders/VRMLLoader.js';
 
 // Some libraries are needed for some loaders (threejs, fbx).
-import chevrotain from "../vendor/threejs/jsm/libs/chevrotain.module.min.js";
-import * as fflate from "../vendor/threejs/jsm/libs/fflate.module.js";
+// import chevrotain from "../vendor/threejs/jsm/libs/chevrotain.module.min.js";
+// import * as fflate from "../vendor/threejs/jsm/libs/fflate.module.js";
 
 // Currently, the config is defined inside the html via js variable "modelViewerOptions".
 
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         renderer.setClearColor(scene.background, 1);
         renderer.shadowMap.enabled = true;
 
-        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
         // renderer.toneMappingExposure = 1.0;
         // renderer.toneMapping = THREE.ACESFilmicToneMapping;
         // renderer.gammaFactor = 2.2;
@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                                     child.material = new THREE.MeshMatcapMaterial({
                                         map: child.material.map,
                                         matcap: matcap,
-                                        color: new THREE.Color().setHex(0xffffff).convertSRGBToLinear(),
+                                        color: new THREE.Color(0xffffff),
                                     });
                                 } else {
                                     child.material = new THREE.MeshStandardMaterial({
