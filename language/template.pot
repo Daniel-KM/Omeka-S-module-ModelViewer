@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-03 00:00+0000\n"
+"POT-Creation-Date: 2026-02-23 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,56 +17,73 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:58
+#: data/scripts/upgrade.php:35 Module.php:65
 #, php-format
-msgid "The library \"%s\" should be installed."
+msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 
-#: Module.php:61 Module.php:67
-msgid "See module’s installation documentation."
+#: data/scripts/upgrade.php:39
+msgid "Missing requirement. Unable to upgrade."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:66
-#, php-format
-msgid "This module requires the module \"%s\"."
-msgstr ""
-
-#: src/Generic/AbstractModule.php:73
-#, php-format
-msgid "This module requires modules \"%s\"."
-msgstr ""
-
-#: src/Generic/AbstractModule.php:80
-msgid "This module has resources that cannot be installed."
-msgstr ""
-
-#: src/Generic/AbstractModule.php:725
+#: Module.php:75
 #, php-format
 msgid ""
-"The module \"%s\" was automatically deactivated because the dependencies are "
-"unavailable."
+"The library \"%s\" should be installed. See module’s installation "
+"documentation."
 msgstr ""
 
-#: Module.php:66
+#: data/scripts/upgrade.php:53
 msgid ""
-"If your json and xml files are not recognized as model, install modules Bulk "
-"Edit and/or Xml Viewer."
+"The version of ThreeJs was upgraded from 150 to 174. Check your models to "
+"see how they display. If needed, a new option allows to load all ThreeJS "
+"addons."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:11
-msgid "Model Viewer"
+#: data/scripts/upgrade.php:58
+msgid ""
+"The support of gltf v1 is deprecated and removed. Upgrade your old models to "
+"gltf v2."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:20
-msgid "Media property for specific config"
+#: data/scripts/upgrade.php:65
+msgid ""
+"The version of ThreeJs was upgraded from 174 to 183. Check your models to "
+"see how they display."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:21
-msgid "It is recommended to hide it on public display."
+#: data/scripts/upgrade.php:84
+msgid ""
+"The default config has been updated to use environment lighting (IBL) for "
+"more natural colors and lights on all 3D objects. The previous flat "
+"\"AmbientLight\" has been removed."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:32
-msgid "Default scene config (json)"
+#: data/scripts/upgrade.php:90
+msgid ""
+"The default config now uses environment lighting (IBL) for more natural "
+"colors and lights. Your custom config has been kept. You may want to update "
+"it in {link}settings{link_end}. The new default json is: {json}"
+msgstr ""
+
+#: Module.php:83
+msgid ""
+"If your json and xml files are not recognized as model, install modules "
+"EasyAdmin or Bulk Edit. See module’s installation documentation."
+msgstr ""
+
+#: Module.php:167
+msgid ""
+"The CORS headers are not set. You should enable Apache module "
+"\"mod_headers\" and add the header \"Access-Control-Allow-Origin\" to allow "
+"other sites to access your 3D models. See readme."
+msgstr ""
+
+#: Module.php:172
+msgid ""
+"The CORS header \"Access-Control-Allow-Origin\" is set multiple times in the "
+"config of Apache or in the file .htaccess. Duplicating the header disables "
+"it. Check your server configuration."
 msgstr ""
 
 #: src/View/Helper/PrepareModelViewer.php:37
@@ -76,4 +93,28 @@ msgstr ""
 #: src/View/Helper/PrepareModelViewer.php:140
 #, php-format
 msgid "[Model viewer]: Specific config for media %d is not a valid json."
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:11
+msgid "Model Viewer"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:18
+msgid "Players"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:32
+msgid "Model Viewer: Media property for specific config"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:33
+msgid "It is recommended to hide it on public display."
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:49
+msgid "Model Viewer: Default scene config (json)"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:64
+msgid "Model Viewer: Load all ThreeJS addons"
 msgstr ""

@@ -7,71 +7,109 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-03 00:00+0000\n"
-"PO-Revision-Date: 2022-01-03 00:00+0000\n"
+"POT-Creation-Date: 2026-02-23 00:00+0000\n"
+"PO-Revision-Date: 2026-02-23 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.6\n"
 
-#: Module.php:58
+#: data/scripts/upgrade.php:35 Module.php:65
 #, php-format
-msgid "The library \"%s\" should be installed."
-msgstr "La bibliothèque \"%s\" doit être installée."
+msgid "The module %1$s should be upgraded to version %2$s or later."
+msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
 
-#: Module.php:61 Module.php:67
-msgid "See module’s installation documentation."
-msgstr "Consulter la documentation d’installation du module."
+#: data/scripts/upgrade.php:39
+msgid "Missing requirement. Unable to upgrade."
+msgstr "Pré-requis absent. Impossible de mettre à jour."
 
-#: src/Generic/AbstractModule.php:66
-#, php-format
-msgid "This module requires the module \"%s\"."
-msgstr "Ce module requiert le module \"%s\"."
-
-#: src/Generic/AbstractModule.php:73
-#, php-format
-msgid "This module requires modules \"%s\"."
-msgstr "Ce module requiert les modules \"%s\"."
-
-#: src/Generic/AbstractModule.php:80
-msgid "This module has resources that cannot be installed."
-msgstr "Ce module a des ressource qui ne peuvent pas être installées."
-
-#: src/Generic/AbstractModule.php:725
+#: Module.php:75
 #, php-format
 msgid ""
-"The module \"%s\" was automatically deactivated because the dependencies are "
-"unavailable."
+"The library \"%s\" should be installed. See module’s installation "
+"documentation."
 msgstr ""
-"Le module \"%s\" a été automatiquement désactivé car ses dépendances ne sont "
-"plus disponibles."
+"La dépendance \"%s\" doit être installée. Consulter la documentation "
+"d’installation du module."
 
-#: Module.php:66
+#: data/scripts/upgrade.php:53
 msgid ""
-"If your json and xml files are not recognized as model, install modules Bulk "
-"Edit and/or Xml Viewer."
+"The version of ThreeJs was upgraded from 150 to 174. Check your models to "
+"see how they display. If needed, a new option allows to load all ThreeJS "
+"addons."
+msgstr ""
+"La version de ThreeJs a été mise à jour de 150 à 174. Vérifiez l’affichage "
+"de vos modèles. Si besoin, une nouvelle option permet de charger des "
+"extensions ThreeJs."
+
+#: data/scripts/upgrade.php:58
+msgid ""
+"The support of gltf v1 is deprecated and removed. Upgrade your old models to "
+"gltf v2."
+msgstr ""
+"La prise en charge de gltf v1 a été supprimée. Mettez à niveau vos modèle en "
+"gltf v2."
+
+#: data/scripts/upgrade.php:65
+msgid ""
+"The version of ThreeJs was upgraded from 174 to 183. Check your models to "
+"see how they display."
+msgstr ""
+"La version de ThreeJs a été mise à jour de 174 à 183. Vérifiez l’affichage "
+"de vos modèles."
+
+#: data/scripts/upgrade.php:84
+msgid ""
+"The default config has been updated to use environment lighting (IBL) for "
+"more natural colors and lights on all 3D objects. The previous flat "
+"\"AmbientLight\" has been removed."
+msgstr ""
+"La config par défaut utilise désormais des couleurs et des lumières "
+"naturelles (IBL) pour tous les objets 3D. La lumière plate \"AmbientLight\" "
+"a été supprimée."
+
+#: data/scripts/upgrade.php:90
+msgid ""
+"The default config now uses environment lighting (IBL) for more natural "
+"colors and lights. Your custom config has been kept. You may want to update "
+"it in {link}settings{link_end}. The new default json is: {json}"
+msgstr ""
+"La config par défaut utilise désormais des couleurs et des lumières "
+"naturelles (IBL). Votre config personnalisée a été conservée. Vous pouvez la "
+"mettre à jour dans les {link}paramètres{link_end}. Le nouveau défaut est : "
+"{json}"
+
+#: Module.php:83
+msgid ""
+"If your json and xml files are not recognized as model, install modules "
+"EasyAdmin or Bulk Edit. See module’s installation documentation."
 msgstr ""
 "Si vos fichiers json et xml ne sont pas reconnus en tant que modèles, "
-"installez les modules Bulk Edit et/ou Xml Viewer."
+"installez les modules EasyAdmin ou Bulk Edit. Consulter la documentation "
+"d’installation du module."
 
-#: src/Form/SettingsFieldset.php:11
-msgid "Model Viewer"
-msgstr "Visionneuse de modèles"
+#: Module.php:167
+msgid ""
+"The CORS headers are not set. You should enable Apache module "
+"\"mod_headers\" and add the header \"Access-Control-Allow-Origin\" to allow "
+"other sites to access your 3D models. See readme."
+msgstr ""
+"Les en-têtes CORS ne sont pas définis. Vous devez activer le module Apache "
+"module \"mod_headers\" et ajouter l’en-tête \"Access-Control-Allow-Origin\" "
+"pour permettre l’accès tiers à vos modèles 3D. Voir le readme."
 
-#: src/Form/SettingsFieldset.php:20
-msgid "Media property for specific config"
-msgstr "Propriété du média pour la configuration spécifique"
-
-#: src/Form/SettingsFieldset.php:21
-msgid "It is recommended to hide it on public display."
-msgstr "Il est recommandé de cacher cette valeur dans l’affichage public."
-
-#: src/Form/SettingsFieldset.php:32
-msgid "Default scene config (json)"
-msgstr "Configuration de la scène par défaut (json)"
+#: Module.php:172
+msgid ""
+"The CORS header \"Access-Control-Allow-Origin\" is set multiple times in the "
+"config of Apache or in the file .htaccess. Duplicating the header disables "
+"it. Check your server configuration."
+msgstr ""
+"L’en-tête CORS \"Access-Control-Allow-Origin\" a été défini plusieurs fois "
+"dans la config Apache ou dans le fichier .htaccess. Ce doublon le désactive. "
+"Vérifiez la configuration de votre serveur."
 
 #: src/View/Helper/PrepareModelViewer.php:37
 msgid "[Model viewer]: Main config is not a valid json."
@@ -83,3 +121,50 @@ msgid "[Model viewer]: Specific config for media %d is not a valid json."
 msgstr ""
 "[Model viewer]: La configuration spécifique du média %d n’est pas un json "
 "valide."
+
+#: src/Form/SettingsFieldset.php:11
+msgid "Model Viewer"
+msgstr "Visionneuse de modèles"
+
+#: src/Form/SettingsFieldset.php:18
+msgid "Players"
+msgstr "Lecteurs"
+
+#: src/Form/SettingsFieldset.php:32
+msgid "Model Viewer: Media property for specific config"
+msgstr "Lecteur 3D : Propriété du média pour la configuration spécifique"
+
+#: src/Form/SettingsFieldset.php:33
+msgid "It is recommended to hide it on public display."
+msgstr "Il est recommandé de cacher cette valeur dans l’affichage public."
+
+#: src/Form/SettingsFieldset.php:49
+msgid "Model Viewer: Default scene config (json)"
+msgstr "Lecteur 3D : Config de la scène par défaut (json)"
+
+#: src/Form/SettingsFieldset.php:64
+msgid "Model Viewer: Load all ThreeJS addons"
+msgstr "Lecteur 3D : Chargement de tous les modules ThreeJs"
+
+#, php-format
+#~ msgid "The library \"%s\" should be installed."
+#~ msgstr "La bibliothèque \"%s\" doit être installée."
+
+#, php-format
+#~ msgid "This module requires the module \"%s\"."
+#~ msgstr "Ce module requiert le module \"%s\"."
+
+#, php-format
+#~ msgid "This module requires modules \"%s\"."
+#~ msgstr "Ce module requiert les modules \"%s\"."
+
+#~ msgid "This module has resources that cannot be installed."
+#~ msgstr "Ce module a des ressource qui ne peuvent pas être installées."
+
+#, php-format
+#~ msgid ""
+#~ "The module \"%s\" was automatically deactivated because the dependencies "
+#~ "are unavailable."
+#~ msgstr ""
+#~ "Le module \"%s\" a été automatiquement désactivé car ses dépendances ne "
+#~ "sont plus disponibles."
