@@ -11,7 +11,7 @@
 
 $resource = $resource ?? null;
 $options = $this->prepareModelViewer($resource, $options ?? []);
-if (is_null($options)) {
+if ($options === null) {
     return;
 }
 
