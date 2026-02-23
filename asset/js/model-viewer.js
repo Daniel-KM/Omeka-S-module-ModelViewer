@@ -8,6 +8,7 @@ import { DDSLoader } from '../vendor/threejs/jsm/loaders/DDSLoader.js';
 import { FBXLoader } from '../vendor/threejs/jsm/loaders/FBXLoader.js';
 import { MTLLoader } from '../vendor/threejs/jsm/loaders/MTLLoader.js';
 import { OBJLoader } from '../vendor/threejs/jsm/loaders/OBJLoader.js';
+import { RoomEnvironment } from '../vendor/threejs/jsm/environments/RoomEnvironment.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
         renderer.setClearColor(scene.background, 1);
         renderer.shadowMap.enabled = true;
         renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.NoToneMapping;
 
         // Camera (default, will be repositioned by auto-fit).
         const cameraConfig = (config.cameras && config.cameras.length)
@@ -102,7 +104,8 @@ document.addEventListener('DOMContentLoaded', function () {
             ? new THREE.TextureLoader(manager).load(matcapTextureFile)
             : null;
 
-        // Lights.
+        // Environment lighting (IBL) + optional extra lights.
+        setupEnvironment(scene, renderer);
         setupLights(scene, config.lights);
 
         // Controls (OrbitControls).
@@ -230,15 +233,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     map: child.material.map,
                     matcap: matcap,
                     color: new THREE.Color(0xffffff),
-                });
-            } else {
-                child.material = new THREE.MeshStandardMaterial({
-                    map: child.material.map,
+                    side: THREE.DoubleSide,
                 });
             }
+            // Keep original GLTF materials (PBR + side) when no matcap.
             if (child.material.map) {
-                child.material.map.anisotropy = anisotropy / 2;
-                child.material.side = THREE.DoubleSide;
+                child.material.map.anisotropy = anisotropy;
             }
             child.castShadow = true;
             child.receiveShadow = true;
@@ -249,13 +249,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // Lights               //
     // ==================== //
 
+    function setupEnvironment(scene, renderer) {
+        var pmrem = new THREE.PMREMGenerator(renderer);
+        pmrem.compileEquirectangularShader();
+        var roomEnv = new RoomEnvironment(renderer);
+        var envTexture = pmrem.fromScene(roomEnv).texture;
+        scene.environment = envTexture;
+        roomEnv.dispose();
+        pmrem.dispose();
+    }
+
     function setupLights(scene, lightsConfig) {
+        // Environment (IBL) handles base lighting.
+        // Extra lights only when explicitly configured.
         if (!lightsConfig || !lightsConfig.length) {
-            // Good default: ambient + directional for proper shading.
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(5, 10, 7);
-            scene.add(dirLight);
             return;
         }
 

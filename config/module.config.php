@@ -70,14 +70,6 @@ return [
                             "lookAt": {"x": 0, "y": 0, "z": 0}
                         }
                     ],
-                    "lights": [
-                        {
-                            "type": "AmbientLight",
-                            "color": 16777215,
-                            "intensity": 0.85,
-                            "position": {"x": 0, "y": 50, "z": 15}
-                        }
-                    ],
                     "speed": {
                         "control": 0.8,
                         "orbit": 0.4,
