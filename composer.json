@@ -52,7 +52,18 @@
     "extra": {
         "installer-name": "ModelViewer",
         "external-assets": {
-            "asset/vendor/threejs/": "https://registry.npmjs.org/three/-/three-0.185.0.tgz",
+            "asset/vendor/threejs/": {
+                "url": "https://registry.npmjs.org/three/-/three-0.185.0.tgz",
+                "exclude": [
+                    "src",
+                    "build/three.cjs",
+                    "build/three.core.js",
+                    "build/three.module.js",
+                    "build/three.tsl.js",
+                    "build/three.webgpu.js",
+                    "build/three.webgpu.nodes.js"
+                ]
+            },
             "asset/vendor/gsap/gsap.min.js": "https://raw.githubusercontent.com/greensock/GSAP/master/dist/gsap.min.js",
             "asset/vendor/matcaps/": "https://github.com/nidorx/matcaps/releases/download/v1.0/64.zip"
         }
