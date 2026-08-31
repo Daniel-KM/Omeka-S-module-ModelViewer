@@ -68,7 +68,7 @@ class Module extends AbstractModule
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
 
-        $js = __DIR__ . '/asset/vendor/threejs/three.module.min.js';
+        $js = __DIR__ . '/asset/vendor/threejs/build/three.module.min.js';
         if (!file_exists($js)) {
             throw new ModuleCannotInstallException(
                 sprintf(

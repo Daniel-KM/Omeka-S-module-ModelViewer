@@ -1,7 +1,7 @@
 "use strict";
 
-import * as THREE from '../vendor/threejs/three.module.min.js';
-import * as Addons from '../vendor/threejs/jsm/Addons.js';
+import * as THREE from '../vendor/threejs/build/three.module.min.js';
+import * as Addons from '../vendor/threejs/examples/jsm/Addons.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function setupEnvironment(scene, renderer) {
         var pmrem = new THREE.PMREMGenerator(renderer);
         pmrem.compileEquirectangularShader();
-        var roomEnv = new Addons.RoomEnvironment(renderer);
+        var roomEnv = new Addons.RoomEnvironment();
         var envTexture = pmrem.fromScene(roomEnv).texture;
         scene.environment = envTexture;
         roomEnv.dispose();

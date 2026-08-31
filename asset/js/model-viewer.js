@@ -1,14 +1,14 @@
 "use strict";
 
-import * as THREE from '../vendor/threejs/three.module.min.js';
-import { OrbitControls } from '../vendor/threejs/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from '../vendor/threejs/jsm/loaders/GLTFLoader.js';
-import { ColladaLoader } from '../vendor/threejs/jsm/loaders/ColladaLoader.js';
-import { DDSLoader } from '../vendor/threejs/jsm/loaders/DDSLoader.js';
-import { FBXLoader } from '../vendor/threejs/jsm/loaders/FBXLoader.js';
-import { MTLLoader } from '../vendor/threejs/jsm/loaders/MTLLoader.js';
-import { OBJLoader } from '../vendor/threejs/jsm/loaders/OBJLoader.js';
-import { RoomEnvironment } from '../vendor/threejs/jsm/environments/RoomEnvironment.js';
+import * as THREE from '../vendor/threejs/build/three.module.min.js';
+import { OrbitControls } from '../vendor/threejs/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from '../vendor/threejs/examples/jsm/loaders/GLTFLoader.js';
+import { ColladaLoader } from '../vendor/threejs/examples/jsm/loaders/ColladaLoader.js';
+import { DDSLoader } from '../vendor/threejs/examples/jsm/loaders/DDSLoader.js';
+import { FBXLoader } from '../vendor/threejs/examples/jsm/loaders/FBXLoader.js';
+import { MTLLoader } from '../vendor/threejs/examples/jsm/loaders/MTLLoader.js';
+import { OBJLoader } from '../vendor/threejs/examples/jsm/loaders/OBJLoader.js';
+import { RoomEnvironment } from '../vendor/threejs/examples/jsm/environments/RoomEnvironment.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function setupEnvironment(scene, renderer) {
         var pmrem = new THREE.PMREMGenerator(renderer);
         pmrem.compileEquirectangularShader();
-        var roomEnv = new RoomEnvironment(renderer);
+        var roomEnv = new RoomEnvironment();
         var envTexture = pmrem.fromScene(roomEnv).texture;
         scene.environment = envTexture;
         roomEnv.dispose();
