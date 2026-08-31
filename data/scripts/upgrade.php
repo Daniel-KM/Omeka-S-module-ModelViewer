@@ -98,3 +98,62 @@ if (version_compare($oldVersion, '3.4.4-183', '<')) {
         $messenger->addWarning($message);
     }
 }
+
+if (version_compare($oldVersion, '3.4.5-p185', '<')) {
+    $message = new PsrMessage(
+        'The version of ThreeJs was upgraded from 183 to 185. Check your models to see how they display.' // @translate
+    );
+    $messenger->addWarning($message);
+
+    $message = new PsrMessage(
+        'The library ThreeJs is now installed from the official npm registry, so the path to its files changed. Check your custom themes if needed.' // @translate
+    );
+    $messenger->addWarning($message);
+
+    // Check the themes for the old paths of the library, that are broken now.
+    // Only the directories "asset" and "view" of each theme are checked, in
+    // order to skip big directories like "node_modules".
+    $regex = '~vendor/threejs/(?!build/|examples/)~';
+    $excluded = ['node_modules', 'vendor', '.git', 'build', 'dist'];
+    $extensions = ['phtml', 'php', 'js', 'css', 'scss', 'html'];
+    $files = [];
+    foreach ([OMEKA_PATH . '/themes', OMEKA_PATH . '/composer-addons/themes'] as $themesPath) {
+        if (!is_dir($themesPath) || !is_readable($themesPath)) {
+            continue;
+        }
+        foreach (new \DirectoryIterator($themesPath) as $theme) {
+            if (!$theme->isDir() || $theme->isDot()) {
+                continue;
+            }
+            foreach (['asset', 'view'] as $subDirectory) {
+                $directory = $theme->getPathname() . '/' . $subDirectory;
+                if (!is_dir($directory) || !is_readable($directory)) {
+                    continue;
+                }
+                $iterator = new \RecursiveCallbackFilterIterator(
+                    new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
+                    fn ($file) => $file->isDir()
+                        ? !in_array($file->getFilename(), $excluded)
+                        : in_array(strtolower($file->getExtension()), $extensions)
+                );
+                /** @var \SplFileInfo $file */
+                foreach (new \RecursiveIteratorIterator($iterator) as $file) {
+                    $content = file_get_contents($file->getPathname());
+                    if ($content !== false && preg_match($regex, $content)) {
+                        $files[] = substr($file->getPathname(), strlen(OMEKA_PATH) + 1);
+                    }
+                }
+            }
+        }
+    }
+
+    if ($files) {
+        sort($files);
+        $message = new PsrMessage(
+            'These files of the themes still use the old path of the ThreeJs library and should be updated: {list}', // @translate
+            ['list' => '<ul><li>' . implode('</li><li>', array_map('htmlspecialchars', $files)) . '</li></ul>']
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addWarning($message);
+    }
+}
