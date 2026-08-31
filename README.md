@@ -40,11 +40,18 @@ Then install it like any other Omeka module and follow the config instructions.
 
 * About threejs
 
-To prepare the tar.gz for threejs: clone the repository and run:
+The library is now downloaded from the official npm registry by [external assets],
+declared in `composer.json`, and extracted into `asset/vendor/threejs`, so the
+files are the ones of the npm package. The builds are in `build/` and the addons
+in `examples/jsm/`. To use another release, update the version in the url
+https://registry.npmjs.org/three/-/three-0.185.0.tgz.
+
+If you need to install a custom build, you can prepare the tar.gz for threejs,
+clone the repository and run:
 
 ```sh
 cd /tmp
-git clone --depth 1 --branch r183 https://github.com/mrdoob/three.js.git
+git clone --depth 1 --branch r185 https://github.com/mrdoob/three.js.git
 cd three.js
 npm install
 npm run build
@@ -53,7 +60,6 @@ npm run build
 Then move files as in directory asset/vendor/threejs (move build/* to root and
 directories inside examples/ to root. Remove some useless files and tar the
 directory.
-
 
 Usage
 -----
@@ -309,7 +315,7 @@ top of the environment. Available light types: `AmbientLight`, `PointLight`,
 architectural models).
 
 To add threejs specific files, you can add the key `import` + js asset type (the
-directory set in asset/vendor/threejs/js) as a subkey + the name of the classes
+directory set in asset/vendor/threejs/examples/jsm) as a subkey + the name of the classes
 (the filename without `.js`).
 
 It's possible to add a texture with key "matcap_texture" and a url to an image,
@@ -482,6 +488,7 @@ Module Model Viewer for Omeka S:
 [Three JS]: https://threejs.org
 [clam av]: https://www.clamav.net
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
+[external assets]: https://gitlab.com/sempia/composer-plugin-external-assets
 [Bulk Edit]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkEdit
 [17 files]: https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/FlightHelmet
 [glTF]: https://en.wikipedia.org/wiki/GlTF
