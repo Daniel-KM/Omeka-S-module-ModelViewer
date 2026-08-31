@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-23 00:00+0000\n"
+"POT-Creation-Date: 2026-08-31 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/scripts/upgrade.php:35 Module.php:65
+#: data/scripts/upgrade.php:35 Module.php:84
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
@@ -26,7 +26,7 @@ msgstr ""
 msgid "Missing requirement. Unable to upgrade."
 msgstr ""
 
-#: Module.php:75
+#: Module.php:93
 #, php-format
 msgid ""
 "The library \"%s\" should be installed. See module’s installation "
@@ -66,20 +66,38 @@ msgid ""
 "it in {link}settings{link_end}. The new default json is: {json}"
 msgstr ""
 
-#: Module.php:83
+#: data/scripts/upgrade.php:104
+msgid ""
+"The version of ThreeJs was upgraded from 183 to 185. Check your models to "
+"see how they display."
+msgstr ""
+
+#: data/scripts/upgrade.php:109
+msgid ""
+"The library ThreeJs is now installed from the official npm registry, so the "
+"path to its files changed. Check your custom themes if needed."
+msgstr ""
+
+#: data/scripts/upgrade.php:153
+msgid ""
+"These files of the themes still use the old path of the ThreeJs library and "
+"should be updated: {list}"
+msgstr ""
+
+#: Module.php:104
 msgid ""
 "If your json and xml files are not recognized as model, install modules "
 "EasyAdmin or Bulk Edit. See module’s installation documentation."
 msgstr ""
 
-#: Module.php:167
+#: Module.php:188
 msgid ""
 "The CORS headers are not set. You should enable Apache module "
 "\"mod_headers\" and add the header \"Access-Control-Allow-Origin\" to allow "
 "other sites to access your 3D models. See readme."
 msgstr ""
 
-#: Module.php:172
+#: Module.php:193
 msgid ""
 "The CORS header \"Access-Control-Allow-Origin\" is set multiple times in the "
 "config of Apache or in the file .htaccess. Duplicating the header disables "

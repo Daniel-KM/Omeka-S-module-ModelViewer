@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-23 00:00+0000\n"
-"PO-Revision-Date: 2026-02-23 00:00+0000\n"
+"POT-Creation-Date: 2026-08-31 00:00+0000\n"
+"PO-Revision-Date: 2026-08-31 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: data/scripts/upgrade.php:35 Module.php:65
+#: data/scripts/upgrade.php:35 Module.php:84
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
@@ -26,7 +26,7 @@ msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieur
 msgid "Missing requirement. Unable to upgrade."
 msgstr "Pré-requis absent. Impossible de mettre à jour."
 
-#: Module.php:75
+#: Module.php:93
 #, php-format
 msgid ""
 "The library \"%s\" should be installed. See module’s installation "
@@ -82,7 +82,32 @@ msgstr ""
 "mettre à jour dans les {link}paramètres{link_end}. Le nouveau défaut est : "
 "{json}"
 
-#: Module.php:83
+#: data/scripts/upgrade.php:104
+msgid ""
+"The version of ThreeJs was upgraded from 183 to 185. Check your models to "
+"see how they display."
+msgstr ""
+"La version de ThreeJs a été mise à jour de 183 à 185. Vérifiez l’affichage "
+"de vos modèles."
+
+#: data/scripts/upgrade.php:109
+msgid ""
+"The library ThreeJs is now installed from the official npm registry, so the "
+"path to its files changed. Check your custom themes if needed."
+msgstr ""
+"La bibliothèque ThreeJs est désormais installée depuis le registre npm "
+"officiel et les chemins ont donc changé. Vérifier vos thèmes si vous les "
+"avez personnalisés."
+
+#: data/scripts/upgrade.php:153
+msgid ""
+"These files of the themes still use the old path of the ThreeJs library and "
+"should be updated: {list}"
+msgstr ""
+"Les fichiers suivants des thèmes utilisent l’ancien chemin de ThreeJs et "
+"doivent être mis à jour : {list}"
+
+#: Module.php:104
 msgid ""
 "If your json and xml files are not recognized as model, install modules "
 "EasyAdmin or Bulk Edit. See module’s installation documentation."
@@ -91,7 +116,7 @@ msgstr ""
 "installez les modules EasyAdmin ou Bulk Edit. Consulter la documentation "
 "d’installation du module."
 
-#: Module.php:167
+#: Module.php:188
 msgid ""
 "The CORS headers are not set. You should enable Apache module "
 "\"mod_headers\" and add the header \"Access-Control-Allow-Origin\" to allow "
@@ -101,7 +126,7 @@ msgstr ""
 "module \"mod_headers\" et ajouter l’en-tête \"Access-Control-Allow-Origin\" "
 "pour permettre l’accès tiers à vos modèles 3D. Voir le readme."
 
-#: Module.php:172
+#: Module.php:193
 msgid ""
 "The CORS header \"Access-Control-Allow-Origin\" is set multiple times in the "
 "config of Apache or in the file .htaccess. Duplicating the header disables "
