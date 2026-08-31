@@ -1,5 +1,5 @@
 {
-    "name": "daniel-km/omeka-s-module-modelviewer",
+    "name": "daniel-km/omeka-s-module-model-viewer",
     "type": "omeka-s-module",
     "description": "Module for Omeka S: Integrates the Three js viewer in order to display 3D models.",
     "keywords": [
@@ -27,7 +27,7 @@
         "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/issues",
         "forum": "https://forum.omeka.org/"
     },
-    "_require (not set until Omeka S merges PR #2412)": {
+    "_require (not set until Omeka S merges PR #2432)": {
         "omeka/omeka-s": "^4.0",
         "daniel-km/omeka-s-module-common": "*"
     },
