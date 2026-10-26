@@ -12,10 +12,6 @@ import { RoomEnvironment } from '../vendor/threejs/examples/jsm/environments/Roo
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    if (typeof modelViewerOptions === 'undefined') {
-        return;
-    }
-
     /**
      * Fit camera so the object fills the viewport.
      */
@@ -489,6 +485,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Init all viewers.
-    modelViewerOptions.forEach(createScene);
+    // Init all viewers from their data attribute, and from the global variable
+    // set by the templates of old themes.
+    const viewersOptions = typeof modelViewerOptions === 'undefined' ? [] : modelViewerOptions;
+    document.querySelectorAll('[data-model-viewer]').forEach(function (element) {
+        viewersOptions.push(JSON.parse(element.dataset.modelViewer));
+    });
+    viewersOptions.forEach(createScene);
 });

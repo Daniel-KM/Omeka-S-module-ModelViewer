@@ -15,15 +15,7 @@ if ($options === null) {
     return;
 }
 
-$optionsJson = json_encode($options, 448);
-$optionsJs = <<<JS
-if (typeof modelViewerOptions === 'undefined') {
-    var modelViewerOptions = [];
-}
-modelViewerOptions.push($optionsJson);
-JS;
-$this->headScript()
-    ->appendScript($optionsJs);
+$escapeAttr = $this->plugin('escapeHtmlAttr');
 
 // User attribute names and values are already escaped.
 $attrs = '';
@@ -34,4 +26,4 @@ foreach ($options['attributes'] as $name => $value) $attrs .= ' ' . $name . '="'
     <h2><?= $options['heading'] ?></h2>
 <?php endif; ?>
 
-<div id="<?= $options['id'] ?>"<?= $attrs ?>><canvas></canvas></div>
+<div id="<?= $options['id'] ?>"<?= $attrs ?> data-model-viewer="<?= $escapeAttr(json_encode($options, 320)) ?>"><canvas></canvas></div>
