@@ -19,7 +19,8 @@ use Common\Stdlib\PsrMessage;
  * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
 $plugins = $services->get('ControllerPluginManager');
-$url = $services->get('ViewHelperManager')->get('url');
+$helpers = $services->get('ViewHelperManager');
+$url = $helpers->get('url');
 $api = $plugins->get('api');
 $settings = $services->get('Omeka\Settings');
 $translate = $plugins->get('translate');
@@ -99,21 +100,13 @@ if (version_compare($oldVersion, '3.4.4-183', '<')) {
     }
 }
 
-if (version_compare($oldVersion, '3.4.5-p185', '<')) {
-    $message = new PsrMessage(
-        'The version of ThreeJs was upgraded from 183 to 185. Check your models to see how they display.' // @translate
-    );
-    $messenger->addWarning($message);
-
-    $message = new PsrMessage(
-        'The library ThreeJs is now installed from the official npm registry, so the path to its files changed. Check your custom themes if needed.' // @translate
-    );
-    $messenger->addWarning($message);
-
-    // Check the themes for the old paths of the library, that are broken now.
-    // Only the directories "asset" and "view" of each theme are checked, in
-    // order to skip big directories like "node_modules".
-    $regex = '~vendor/threejs/(?!build/|examples/)~';
+/**
+ * List the files of the themes matching a regex.
+ *
+ * Only the directories "asset" and "view" of each theme are checked, in order
+ * to skip big directories like "node_modules".
+ */
+$themeFilesMatching = function (string $regex): array {
     $excluded = ['node_modules', 'vendor', '.git', 'build', 'dist'];
     $extensions = ['phtml', 'php', 'js', 'css', 'scss', 'html'];
     $files = [];
@@ -146,11 +139,43 @@ if (version_compare($oldVersion, '3.4.5-p185', '<')) {
             }
         }
     }
+    sort($files);
+    return $files;
+};
 
+if (version_compare($oldVersion, '3.4.5-p185', '<')) {
+    $message = new PsrMessage(
+        'The version of ThreeJs was upgraded from 183 to 185. Check your models to see how they display.' // @translate
+    );
+    $messenger->addWarning($message);
+
+    $message = new PsrMessage(
+        'The library ThreeJs is now installed from the official npm registry, so the path to its files changed. Check your custom themes if needed.' // @translate
+    );
+    $messenger->addWarning($message);
+
+    $files = $themeFilesMatching('~vendor/threejs/(?!build/|examples/)~');
     if ($files) {
-        sort($files);
         $message = new PsrMessage(
             'These files of the themes still use the old path of the ThreeJs library and should be updated: {list}', // @translate
+            ['list' => '<ul><li>' . implode('</li><li>', array_map('htmlspecialchars', $files)) . '</li></ul>']
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addWarning($message);
+    }
+}
+
+if (version_compare($oldVersion, '3.4.6-p187', '<')) {
+    $message = new PsrMessage(
+        'The version of ThreeJs was upgraded from 185 to 187. Check your models to see how they display.' // @translate
+    );
+    $messenger->addWarning($message);
+
+    // The npm package does not include the minified builds anymore.
+    $files = $themeFilesMatching('~vendor/threejs/build/[\w.-]+\.min\.js~');
+    if ($files) {
+        $message = new PsrMessage(
+            'The library ThreeJs does not include the minified files anymore, so these files of the themes should use "three.module.js" instead of "three.module.min.js": {list}', // @translate
             ['list' => '<ul><li>' . implode('</li><li>', array_map('htmlspecialchars', $files)) . '</li></ul>']
         );
         $message->setEscapeHtml(false);

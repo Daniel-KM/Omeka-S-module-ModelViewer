@@ -499,7 +499,7 @@ Module Model Viewer for Omeka S:
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
 [JsonFormatter]: https://jsonformatter.org
 [see example]: https://www.morphosource.org/manifests/1fbaa268-b02f-4b46-a249-cef46bcbe04c
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/work_items
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
