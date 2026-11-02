@@ -87,14 +87,6 @@ class Module extends AbstractModule
             $errors[] = (string) $message;
         }
 
-        $js = __DIR__ . '/asset/vendor/threejs/build/three.module.min.js';
-        if (!file_exists($js)) {
-            $errors[] = sprintf(
-                $translator->translate('The library "%s" should be installed. See module’s installation documentation.'), // @translate
-                'Three Js'
-            );
-        }
-
         if ($errors) {
             throw new ModuleCannotInstallException(implode("\n", $errors));
         }
