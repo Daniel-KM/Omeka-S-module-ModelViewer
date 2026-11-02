@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 00:00+0000\n"
-"PO-Revision-Date: 2026-08-31 00:00+0000\n"
+"POT-Creation-Date: 2026-11-02 00:00+0000\n"
+"PO-Revision-Date: 2026-11-02 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -17,25 +17,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: data/scripts/upgrade.php:35 Module.php:84
+#: data/scripts/upgrade.php:36 Module.php:84
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
 
-#: data/scripts/upgrade.php:39
+#: data/scripts/upgrade.php:40
 msgid "Missing requirement. Unable to upgrade."
 msgstr "Pré-requis absent. Impossible de mettre à jour."
 
-#: Module.php:93
-#, php-format
-msgid ""
-"The library \"%s\" should be installed. See module’s installation "
-"documentation."
-msgstr ""
-"La dépendance \"%s\" doit être installée. Consulter la documentation "
-"d’installation du module."
-
-#: data/scripts/upgrade.php:53
+#: data/scripts/upgrade.php:54
 msgid ""
 "The version of ThreeJs was upgraded from 150 to 174. Check your models to "
 "see how they display. If needed, a new option allows to load all ThreeJS "
@@ -45,7 +36,7 @@ msgstr ""
 "de vos modèles. Si besoin, une nouvelle option permet de charger des "
 "extensions ThreeJs."
 
-#: data/scripts/upgrade.php:58
+#: data/scripts/upgrade.php:59
 msgid ""
 "The support of gltf v1 is deprecated and removed. Upgrade your old models to "
 "gltf v2."
@@ -53,7 +44,7 @@ msgstr ""
 "La prise en charge de gltf v1 a été supprimée. Mettez à niveau vos modèle en "
 "gltf v2."
 
-#: data/scripts/upgrade.php:65
+#: data/scripts/upgrade.php:66
 msgid ""
 "The version of ThreeJs was upgraded from 174 to 183. Check your models to "
 "see how they display."
@@ -61,7 +52,7 @@ msgstr ""
 "La version de ThreeJs a été mise à jour de 174 à 183. Vérifiez l’affichage "
 "de vos modèles."
 
-#: data/scripts/upgrade.php:84
+#: data/scripts/upgrade.php:85
 msgid ""
 "The default config has been updated to use environment lighting (IBL) for "
 "more natural colors and lights on all 3D objects. The previous flat "
@@ -71,7 +62,7 @@ msgstr ""
 "naturelles (IBL) pour tous les objets 3D. La lumière plate \"AmbientLight\" "
 "a été supprimée."
 
-#: data/scripts/upgrade.php:90
+#: data/scripts/upgrade.php:91
 msgid ""
 "The default config now uses environment lighting (IBL) for more natural "
 "colors and lights. Your custom config has been kept. You may want to update "
@@ -82,7 +73,7 @@ msgstr ""
 "mettre à jour dans les {link}paramètres{link_end}. Le nouveau défaut est : "
 "{json}"
 
-#: data/scripts/upgrade.php:104
+#: data/scripts/upgrade.php:148
 msgid ""
 "The version of ThreeJs was upgraded from 183 to 185. Check your models to "
 "see how they display."
@@ -90,7 +81,7 @@ msgstr ""
 "La version de ThreeJs a été mise à jour de 183 à 185. Vérifiez l’affichage "
 "de vos modèles."
 
-#: data/scripts/upgrade.php:109
+#: data/scripts/upgrade.php:153
 msgid ""
 "The library ThreeJs is now installed from the official npm registry, so the "
 "path to its files changed. Check your custom themes if needed."
@@ -99,7 +90,7 @@ msgstr ""
 "officiel et les chemins ont donc changé. Vérifier vos thèmes si vous les "
 "avez personnalisés."
 
-#: data/scripts/upgrade.php:153
+#: data/scripts/upgrade.php:160
 msgid ""
 "These files of the themes still use the old path of the ThreeJs library and "
 "should be updated: {list}"
@@ -107,7 +98,26 @@ msgstr ""
 "Les fichiers suivants des thèmes utilisent l’ancien chemin de ThreeJs et "
 "doivent être mis à jour : {list}"
 
-#: Module.php:104
+#
+#: data/scripts/upgrade.php:170
+msgid ""
+"The version of ThreeJs was upgraded from 185 to 187. Check your models to "
+"see how they display."
+msgstr ""
+"La version de ThreeJs a été mise à jour de 185 à 187. Vérifiez l’affichage "
+"de vos modèles."
+
+#: data/scripts/upgrade.php:178
+msgid ""
+"The library ThreeJs does not include the minified files anymore, so these "
+"files of the themes should use \"three.module.js\" instead of "
+"\"three.module.min.js\": {list}"
+msgstr ""
+"La bibliothèque ThreeJs ne contient plus les fichiers minifiés : ces "
+"fichiers des thèmes doivent utiliser « three.module.js » au lieu de "
+"« three.module.min.js » : {list}"
+
+#: Module.php:96
 msgid ""
 "If your json and xml files are not recognized as model, install modules "
 "EasyAdmin or Bulk Edit. See module’s installation documentation."
@@ -116,7 +126,7 @@ msgstr ""
 "installez les modules EasyAdmin ou Bulk Edit. Consulter la documentation "
 "d’installation du module."
 
-#: Module.php:188
+#: Module.php:180
 msgid ""
 "The CORS headers are not set. You should enable Apache module "
 "\"mod_headers\" and add the header \"Access-Control-Allow-Origin\" to allow "
@@ -126,7 +136,7 @@ msgstr ""
 "module \"mod_headers\" et ajouter l’en-tête \"Access-Control-Allow-Origin\" "
 "pour permettre l’accès tiers à vos modèles 3D. Voir le readme."
 
-#: Module.php:193
+#: Module.php:185
 msgid ""
 "The CORS header \"Access-Control-Allow-Origin\" is set multiple times in the "
 "config of Apache or in the file .htaccess. Duplicating the header disables "
@@ -167,9 +177,27 @@ msgstr "Il est recommandé de cacher cette valeur dans l’affichage public."
 msgid "Model Viewer: Default scene config (json)"
 msgstr "Lecteur 3D : Config de la scène par défaut (json)"
 
+#: src/Form/SettingsFieldset.php:50
+msgid ""
+"This config is used to set default params and each key may be overridden by "
+"the model. The json is not checked, so verify commas and double quotes or "
+"use https://jsonformatter.org."
+msgstr ""
+"Cette configuration définit les paramètres par défaut et chaque clé peut "
+"être remplacée par le modèle. Le json n’est pas vérifié : vérifiez les "
+"virgules et les guillemets doubles, ou utilisez https://jsonformatter.org."
+
 #: src/Form/SettingsFieldset.php:64
 msgid "Model Viewer: Load all ThreeJS addons"
 msgstr "Lecteur 3D : Chargement de tous les modules ThreeJs"
+
+#, php-format
+#~ msgid ""
+#~ "The library \"%s\" should be installed. See module’s installation "
+#~ "documentation."
+#~ msgstr ""
+#~ "La dépendance \"%s\" doit être installée. Consulter la documentation "
+#~ "d’installation du module."
 
 #, php-format
 #~ msgid "The library \"%s\" should be installed."

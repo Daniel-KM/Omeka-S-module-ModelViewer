@@ -47,7 +47,7 @@ class SettingsFieldset extends Fieldset
                 'options' => [
                     'element_group' => 'player',
                     'label' => 'Model Viewer: Default scene config (json)', // @translate
-                    'info' => 'This config is used to set default params and each key may be overridden by the model. The json is not checked, so verify commas and double quotes or use https://jsonformatter.org.', // translate
+                    'info' => 'This config is used to set default params and each key may be overridden by the model. The json is not checked, so verify commas and double quotes or use https://jsonformatter.org.', // @translate
                     'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer#specific-config',
                 ],
                 'attributes' => [
