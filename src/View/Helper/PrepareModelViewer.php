@@ -186,7 +186,9 @@ class PrepareModelViewer extends AbstractHelper
             $importMap = <<<JSON
                 {
                     "imports": {
-                        "three": "$three/build/three.module.min.js"
+                        "three": "$three/build/three.module.js",
+                        "three/webgpu": "$three/build/three.webgpu.js",
+                        "three/tsl": "$three/build/three.tsl.js"
                    }
                 }
                 JSON;

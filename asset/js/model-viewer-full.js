@@ -1,6 +1,6 @@
 "use strict";
 
-import * as THREE from '../vendor/threejs/build/three.module.min.js';
+import * as THREE from '../vendor/threejs/build/three.module.js';
 import * as Addons from '../vendor/threejs/examples/jsm/Addons.js';
 
 document.addEventListener('DOMContentLoaded', function () {

@@ -1,6 +1,6 @@
 "use strict";
 
-import * as THREE from '../vendor/threejs/build/three.module.min.js';
+import * as THREE from '../vendor/threejs/build/three.module.js';
 import { OrbitControls } from '../vendor/threejs/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from '../vendor/threejs/examples/jsm/loaders/GLTFLoader.js';
 import { ColladaLoader } from '../vendor/threejs/examples/jsm/loaders/ColladaLoader.js';
