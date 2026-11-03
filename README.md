@@ -43,23 +43,25 @@ Then install it like any other Omeka module and follow the config instructions.
 The library is now downloaded from the official npm registry by [external assets],
 declared in `composer.json`, and extracted into `asset/vendor/threejs`, so the
 files are the ones of the npm package. The builds are in `build/` and the addons
-in `examples/jsm/`. To use another release, update the version in the url
-https://registry.npmjs.org/three/-/three-0.185.0.tgz.
+in `examples/jsm/`. Since version 187, the npm package does not include the
+minified builds, so the viewer uses `build/three.module.js`. To use another
+release, update the version in the url
+https://registry.npmjs.org/three/-/three-0.187.0.tgz.
 
 If you need to install a custom build, you can prepare the tar.gz for threejs,
 clone the repository and run:
 
 ```sh
 cd /tmp
-git clone --depth 1 --branch r185 https://github.com/mrdoob/three.js.git
+git clone --depth 1 --branch r187 https://github.com/mrdoob/three.js.git
 cd three.js
 npm install
 npm run build
 ```
 
-Then move files as in directory asset/vendor/threejs (move build/* to root and
-directories inside examples/ to root. Remove some useless files and tar the
-directory.
+Then replace the directories `build/` and `examples/` of `asset/vendor/threejs`
+by the ones of the built repository. The structure is the one of the npm package,
+so the paths stay the same.
 
 Usage
 -----
@@ -480,11 +482,11 @@ Module Model Viewer for Omeka S:
 
 [Model viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer
 [Omeka S]: https://omeka.org/s
+[installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [three.js]: https://threejs.org
 [PSL digital library]: https://bibnum.explore.psl.eu/s/psl/ark:/18469/3t76z
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [ModelViewer.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/releases
-[threejs]: https://threejs.org
 [Three JS]: https://threejs.org
 [clam av]: https://www.clamav.net
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
@@ -495,7 +497,6 @@ Module Model Viewer for Omeka S:
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
-[Universal Viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-UniversalViewer
 [JsonFormatter]: https://jsonformatter.org
 [see example]: https://www.morphosource.org/manifests/1fbaa268-b02f-4b46-a249-cef46bcbe04c
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-ModelViewer/-/issues
@@ -505,7 +506,7 @@ Module Model Viewer for Omeka S:
 [OSI]: http://opensource.org
 [MIT licence]: https://github.com/UniversalViewer/universalviewer/blob/master/LICENSE.txt
 [threejs.org]: https://threejs.org
-[gsap]: https://greensock.com/gsap
+[gsap]: https://gsap.com
 [Nidorx MatCap]: https://github.com/nidorx/matcaps
 [GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
