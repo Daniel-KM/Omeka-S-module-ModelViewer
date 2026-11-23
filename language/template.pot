@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 00:00+0000\n"
+"POT-Creation-Date: 2026-11-23 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,15 @@ msgstr ""
 
 #: data/scripts/upgrade.php:40
 msgid "Missing requirement. Unable to upgrade."
+msgstr ""
+
+#: src/View/Helper/PrepareModelViewer.php:116
+msgid ""
+"Your browser cannot display this 3D model, because WebGL is unavailable."
+msgstr ""
+
+#: src/View/Helper/PrepareModelViewer.php:117
+msgid "Download the file"
 msgstr ""
 
 #: data/scripts/upgrade.php:54
@@ -96,14 +105,14 @@ msgid ""
 "EasyAdmin or Bulk Edit. See module’s installation documentation."
 msgstr ""
 
-#: Module.php:180
+#: Module.php:170
 msgid ""
 "The CORS headers are not set. You should enable Apache module "
 "\"mod_headers\" and add the header \"Access-Control-Allow-Origin\" to allow "
 "other sites to access your 3D models. See readme."
 msgstr ""
 
-#: Module.php:185
+#: Module.php:175
 msgid ""
 "The CORS header \"Access-Control-Allow-Origin\" is set multiple times in the "
 "config of Apache or in the file .htaccess. Duplicating the header disables "
@@ -114,7 +123,7 @@ msgstr ""
 msgid "[Model viewer]: Main config is not a valid json."
 msgstr ""
 
-#: src/View/Helper/PrepareModelViewer.php:140
+#: src/View/Helper/PrepareModelViewer.php:144
 #, php-format
 msgid "[Model viewer]: Specific config for media %d is not a valid json."
 msgstr ""
