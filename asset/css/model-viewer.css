@@ -32,6 +32,16 @@
         transition-duration: 200ms;
         font-family: Arial, Helvetica, sans-serif;
     }
+    .model-viewer .error {
+        margin: auto;
+        padding: 1em;
+        text-align: center;
+        background-color: #363636;
+        color: white;
+    }
+    .model-viewer .error a {
+        color: inherit;
+    }
     .model-viewer .progress {
         width: 400px;
         height: 24px;

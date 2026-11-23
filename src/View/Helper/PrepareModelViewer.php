@@ -112,6 +112,10 @@ class PrepareModelViewer extends AbstractHelper
         // $options['extension'] = $media ? $media->extension() : null;
         // A special option to load materials for collada or .obj.
         $options['mtl'] = $options['mtl'] ?? [];
+        $options['messages'] = [
+            'webgl' => $view->translate('Your browser cannot display this 3D model, because WebGL is unavailable.'), // @translate
+            'download' => $view->translate('Download the file'), // @translate
+        ];
 
         // Check associated files if they are not listed in the main file for
         // some formats.

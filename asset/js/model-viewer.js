@@ -74,11 +74,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const progressLoader = createProgressUI(viewerElement, manager);
 
         // Renderer.
-        const renderer = new THREE.WebGLRenderer({
-            canvas: canvas,
-            antialias: true,
-            alpha: true,
-        });
+        let renderer;
+        try {
+            renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true,
+            });
+        } catch (e) {
+            showWebglError(viewerElement, options);
+            return;
+        }
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         renderer.setClearColor(scene.background, 1);
@@ -323,6 +329,23 @@ document.addEventListener('DOMContentLoaded', function () {
     // UI                   //
     // ==================== //
 
+    /**
+     * Replace the viewer by a message when the browser cannot use WebGL.
+     */
+    function showWebglError(viewerElement, options) {
+        const messages = options.messages || {};
+        const error = document.createElement('div');
+        error.className = 'error';
+        const msg = document.createElement('p');
+        msg.textContent = messages.webgl || 'Your browser cannot display this 3D model, because WebGL is unavailable.';
+        error.appendChild(msg);
+        const link = document.createElement('a');
+        link.href = options.source;
+        link.textContent = messages.download || 'Download the file';
+        error.appendChild(link);
+        viewerElement.replaceChildren(error);
+    }
+
     function createProgressUI(viewerElement, manager) {
         const loader = document.createElement('div');
         loader.className = 'loader';
@@ -491,5 +514,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-model-viewer]').forEach(function (element) {
         viewersOptions.push(JSON.parse(element.dataset.modelViewer));
     });
-    viewersOptions.forEach(createScene);
+    // An error in a viewer should not prevent to display the other ones.
+    viewersOptions.forEach(function (options) {
+        try {
+            createScene(options);
+        } catch (e) {
+            console.error(e);
+        }
+    });
 });
