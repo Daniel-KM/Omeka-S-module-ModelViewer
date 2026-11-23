@@ -128,19 +128,9 @@ class Module extends AbstractModule
 
     protected function updateWhitelist(): void
     {
-        $settings = $this->getServiceLocator()->get('Omeka\Settings');
-
-        $whitelist = $settings->get('media_type_whitelist', []);
         $mediaTypes = require __DIR__ . '/data/media-types/media-type-identifiers.php';
-        $whitelist = array_unique(array_merge(array_values($whitelist), array_values($mediaTypes)));
-        sort($whitelist);
-        $settings->set('media_type_whitelist', $whitelist);
-
-        $whitelist = $settings->get('extension_whitelist', []);
         $extensions = require __DIR__ . '/data/media-types/media-type-extensions.php';
-        $whitelist = array_unique(array_merge(array_values($whitelist), array_values($extensions)));
-        sort($whitelist);
-        $settings->set('extension_whitelist', $whitelist);
+        $this->allowMediaTypes(array_values($mediaTypes), array_values($extensions));
     }
 
     /**
